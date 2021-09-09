@@ -1,4 +1,5 @@
 const { Color, TreeItem } = window.zeaEngine;
+const { CADBody } = zeaCad;
 
 const highlightColor = new Color("#F9CE03");
 highlightColor.a = 0.1;
@@ -33,18 +34,22 @@ class TreeItemView extends HTMLElement {
     this.itemContainer.appendChild(this.itemChildren);
 
     // Item expand button
-    this.expandBtn = document.createElement("button");
-    this.expandBtn.className = "TreeNodesListItem__ToggleExpanded";
-    this.itemHeader.appendChild(this.expandBtn);
 
-    this.expanded = false;
-    this.childrenAlreadyCreated = false;
+    {
+      this.expandBtn = document.createElement("button");
+      this.expandBtn.className = "TreeNodesListItem__ToggleExpanded";
+      this.itemHeader.appendChild(this.expandBtn);
 
-    this.expandBtn.addEventListener("click", () => {
-      if (this.treeItem.getNumChildren() > 0) {
-        this.expanded ? this.collapse() : this.expand();
-      }
-    });
+      this.expanded = false;
+      this.childrenAlreadyCreated = false;
+
+      this.expandBtn.addEventListener("click", () => {
+        const numChildren = this.countChildren();
+        if (numChildren > 0) {
+          this.expanded ? this.collapse() : this.expand();
+        }
+      });
+    }
 
     // Title element
     this.titleElement = document.createElement("span");
@@ -106,6 +111,8 @@ class TreeItemView extends HTMLElement {
       // Visibility Checkbox
       this.toggleVisibilityBtn = document.createElement("input");
       this.toggleVisibilityBtn.type = "checkbox";
+      this.toggleVisibilityBtn.className =
+        "TreeNodesListItem__ToggleVisibility";
 
       this.itemHeader.insertBefore(this.toggleVisibilityBtn, this.titleElement);
 
@@ -128,7 +135,8 @@ class TreeItemView extends HTMLElement {
       this.treeItem.on("highlightChanged", this.updateHighlight.bind(this));
       this.updateHighlight();
 
-      if (this.treeItem.getChildren().length) {
+      const numChildren = this.countChildren();
+      if (numChildren > 0) {
         this.collapse();
       }
 
@@ -194,19 +202,37 @@ class TreeItemView extends HTMLElement {
     }
   }
 
+  countChildren() {
+    const children = this.treeItem.getChildren();
+    let count = 0;
+    children.forEach((childItem, index) => {
+      if (
+        childItem instanceof TreeItem &&
+        childItem.getSelectable() &&
+        !(childItem instanceof CADBody)
+      ) {
+        count++;
+      }
+    });
+    return count;
+  }
+
   /**
    * The expand method.
    */
   expand() {
     this.expanded = true;
     this.itemChildren.classList.remove("TreeNodesList--collapsed");
-    this.expandBtn.innerHTML =
-      '<i class="material-icons md-24">arrow_drop_down</i>';
+    this.expandBtn.innerHTML = "-";
 
     if (!this.childrenAlreadyCreated) {
       const children = this.treeItem.getChildren();
       children.forEach((childItem, index) => {
-        if (childItem instanceof TreeItem && childItem.getSelectable()) {
+        if (
+          childItem instanceof TreeItem &&
+          childItem.getSelectable() &&
+          !(childItem instanceof CADBody)
+        ) {
           this.addChild(childItem, index);
         }
       });
@@ -219,8 +245,7 @@ class TreeItemView extends HTMLElement {
    */
   collapse() {
     this.itemChildren.classList.add("TreeNodesList--collapsed");
-    this.expandBtn.innerHTML =
-      '<i class="material-icons md-24">arrow_right</i>';
+    this.expandBtn.innerHTML = "+";
     this.expanded = false;
   }
 
@@ -281,57 +306,6 @@ class TreeItemView extends HTMLElement {
 TreeItemView.css = `
   /* tree-view.css */
 
-  ////
-  /// From https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined
-
-  /* fallback */
-  @font-face {
-    font-family: 'Material Icons';
-    font-style: normal;
-    font-weight: 400;
-    src: url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
-  }
-  /* fallback */
-  @font-face {
-    font-family: 'Material Icons Outlined';
-    font-style: normal;
-    font-weight: 400;
-    src: url(https://fonts.gstatic.com/s/materialiconsoutlined/v14/gok-H7zzDkdnRel8-DQ6KAXJ69wP1tGnf4ZGhUce.woff2) format('woff2');
-  }
-
-  .material-icons {
-    font-family: 'Material Icons';
-    font-weight: normal;
-    font-style: normal;
-    font-size: 24px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    -webkit-font-feature-settings: 'liga';
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .material-icons-outlined {
-    font-family: 'Material Icons Outlined';
-    font-weight: normal;
-    font-style: normal;
-    font-size: 24px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    -webkit-font-feature-settings: 'liga';
-    -webkit-font-smoothing: antialiased;
-    background-color: #fff0;
-    color: azure;
-  }
   .TreeNodesList {
     border-left: 1px dotted;
     list-style-type: none;
@@ -362,6 +336,10 @@ TreeItemView.css = `
     background-color: #0000;
     color: azure;
     outline: none;
+    margin: 2px 0 0 0;
+  }
+  .TreeNodesListItem__ToggleVisibility {
+    margin: 8px 0 0 0;
   }
 
   .TreeNodesListItem::before {
@@ -388,13 +366,8 @@ TreeItemView.css = `
     cursor: default;
     padding: 2px 4px;
     border-radius: 5px;
-    // color: azure;
   }
 
-  .TreeNodesListItem__Title:hover {
-    // background-color: #e1f5fe;
-    // color: azure;
-  }
   .TreeNodesListItem__Hover {
     background-color: #e1f5fe;
   }
@@ -415,40 +388,6 @@ TreeItemView.css = `
   .TreeNodesListItem--isHighlighted > .TreeNodeHeader >  .TreeNodesListItem__Title {
     // border-style: solid;
     // border-width: thin;
-  }
-
-  /* Rules for sizing the icon. */
-  .material-icons-outlined.md-15,
-  .material-icons.md-15 {
-    font-size: 15px;
-  }
-  .material-icons.md-18 {
-    font-size: 18px;
-  }
-  .material-icons.md-24 {
-    font-size: 24px;
-  }
-  .material-icons.md-36 {
-    font-size: 36px;
-  }
-  .material-icons.md-48 {
-    font-size: 48px;
-  }
-
-  /* Rules for using icons as black on a light background. */
-  .material-icons.md-dark {
-    color: rgba(0, 0, 0, 0.54);
-  }
-  .material-icons.md-dark.md-inactive {
-    color: rgba(0, 0, 0, 0.26);
-  }
-
-  /* Rules for using icons as white on a dark background. */
-  .material-icons.md-light {
-    color: rgba(255, 255, 255, 1);
-  }
-  .material-icons.md-light.md-inactive {
-    color: rgba(255, 255, 255, 0.3);
   }
 
   `;
@@ -488,34 +427,6 @@ class SceneTreeView extends HTMLElement {
     // Init root tree item
     this.treeItemView = document.createElement("tree-item-view");
     this.treeContainer.appendChild(this.treeItemView);
-
-    //////////////////////
-    // Force loading of @font-face so the main page desn't have to.
-    // this is to work around a limitation in Chrome, where @font-face
-    // Are not loaded in the shadow dom and must be loaded in the page.
-    // See here: https://github.com/mdn/interactive-examples/issues/887
-
-    const fontFaceSheet1 = new CSSStyleSheet();
-    fontFaceSheet1.replaceSync(`@font-face {
-      font-family: "Material Icons";
-      font-style: normal;
-      font-weight: 400;
-      src: url('https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2') format('woff');
-    }`);
-
-    const fontFaceSheet2 = new CSSStyleSheet();
-    fontFaceSheet2.replaceSync(`@font-face {
-      font-family: "Material Icons Outlined";
-      font-style: normal;
-      font-weight: 400;
-      src: url('https://fonts.gstatic.com/s/materialiconsoutlined/v14/gok-H7zzDkdnRel8-DQ6KAXJ69wP1tGnf4ZGhUce.woff2') format('woff');
-    }`);
-
-    document.adoptedStyleSheets = [
-      ...document.adoptedStyleSheets,
-      fontFaceSheet1,
-      fontFaceSheet2,
-    ];
 
     this.__onKeyDown = this.__onKeyDown.bind(this);
     this.__onMouseEnter = this.__onMouseEnter.bind(this);
