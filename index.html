@@ -112,42 +112,11 @@
         background-color: #78b87a;
       }
     </style>
-    <script type="module">
-      export class FPSDisplay extends HTMLElement {
-        constructor() {
-          super();
-          const shadowRoot = this.attachShadow({ mode: "open" });
-
-          this.div = document.createElement("div");
-          this.div.classList.add("fps-display");
-          shadowRoot.appendChild(this.div);
-
-          const styleTag = document.createElement("style");
-          styleTag.appendChild(
-            document.createTextNode(`
-    .fps-display {
-        position: fixed;
-        bottom: 10px;
-        right: 10px;
-        color: #333333;
-    }
-`)
-          );
-          shadowRoot.appendChild(styleTag);
-        }
-
-        set renderer(renderer) {
-          let frameCounter = 0;
-          renderer.on("redrawOccurred", () => frameCounter++);
-          setInterval(() => {
-            this.div.textContent = `Fps: ${frameCounter * 2}`;
-            frameCounter = 0;
-          }, 500);
-        }
-      }
-
-      customElements.define("fps-display", FPSDisplay);
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@3/dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@3/dist/plugins.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@3/dist/index.umd.js"></script>
+    <script src="./src/zea-fps-display.js" type="module"></script>
+    <script src="./src/scene-tree-view.js" type="module"></script>
   </head>
   <body class="overflow-hidden">
     <div class="layout grid h-screen">
@@ -157,7 +126,7 @@
       <main class="splitter">
         <div id="leftPanel">
           <scene-tree-view
-            id="scene-tree-view"
+            id="tree"
             class="max-w-full max-h-full select-none"
           ></scene-tree-view>
         </div>
@@ -167,17 +136,14 @@
             <canvas id="canvas"> </canvas>
           </div>
           <div class="xr-button hidden" id="xr-button"></div>
-          <fps-display id="fps"></fps-display>
+          <zea-fps-display id="fps"></zea-fps-display>
           <progress class="progress-display" id="progress" value="0" max="100">
             0%
           </progress>
         </div>
       </main>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@3/dist/index.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@3/dist/plugins.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@3/dist/index.umd.js"></script>
-    <script>
+    <script type="module">
       // A function is used for dragging and moving
       function dragElement(element, direction) {
         var md; // remember mouse down info
@@ -243,7 +209,7 @@
         MeshProxy,
         LinesProxy,
       } = zeaEngine;
-      const { CADAsset } = zeaCad;
+      const { CADAsset, CADBody } = zeaCad;
 
       const urlParams = new URLSearchParams(window.location.search);
       const scene = new Scene();
@@ -306,12 +272,22 @@
       const fpsElement = document.getElementById("fps");
       fpsElement.renderer = renderer;
 
+      // Setup TreeView Display
+      const treeElement = document.getElementById("tree");
+      treeElement.setTreeItem(scene.getRoot());
+
       let highlightedItem;
+      const highlightColor = new Color("#F9CE03");
+      highlightColor.a = 0.1;
+      const filterItem = (item) => {
+        while (item && !(item instanceof CADBody)) item = item.getOwner()
+        return item
+      }
       renderer.getViewport().on("pointerOverGeom", (event) => {
-        highlightedItem = event.intersectionData.geomItem;
+        highlightedItem = filterItem(event.intersectionData.geomItem);
         highlightedItem.addHighlight(
           "pointerOverGeom",
-          new Color(0.8, 0.8, 0.8, 0.1),
+          highlightColor,
           true
         );
       });
@@ -321,7 +297,7 @@
       });
       renderer.getViewport().on("pointerDown", (event) => {
         if (event.intersectionData) {
-          const { geomItem } = event.intersectionData;
+          const  geomItem = filterItem(event.intersectionData.geomItem);
           console.log(geomItem.getPath());
         }
       });
