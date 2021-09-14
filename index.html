@@ -12,106 +12,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css"
     />
-
-    <style>
-      body {
-        height: 100vh;
-        overflow: hidden;
-        margin: 0em;
-        background-color: #2d2d2d;
-      }
-      .layout {
-        grid-template-areas:
-          "header"
-          "main";
-        grid-template-rows: 50px 1fr;
-      }
-
-      header {
-        grid-area: header;
-        overflow: hidden;
-      }
-      main {
-        grid-area: main;
-        position: relative;
-      }
-      #logo {
-        height: 30px;
-      }
-
-      .splitter {
-        width: 100%;
-        height: 100%;
-        display: flex;
-      }
-      #separator {
-        cursor: col-resize;
-        background-color: #aaa;
-        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='30'><path d='M2 0 v30 M5 0 v30 M8 0 v30' fill='none' stroke='black'/></svg>");
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 10px;
-        height: 100%;
-
-        /* Prevent the browser's built-in drag from interfering */
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-      }
-      #leftPanel {
-        width: 20%;
-        height: 100%;
-        min-width: 10px;
-      }
-      #mainPanel {
-        position: relative;
-        width: 80%;
-        height: 100%;
-        min-width: 10px;
-        background-color: #eeeeee;
-      }
-      #canvas-holder {
-        position: relative;
-        width: 100%;
-        height: 100%;
-      }
-      #canvas {
-        touch-action: none;
-      }
-
-      .progress-display {
-        position: absolute;
-        left: 0px;
-        bottom: 0px;
-        width: 100%;
-        height: 5px;
-      }
-      .hidden {
-        visibility: hidden;
-      }
-      .xr-button {
-        position: absolute;
-        right: 10px;
-        bottom: 10px;
-
-        font-family: "arial";
-        background-color: #f9ce03; /* Green */
-        border: none;
-        color: black;
-        padding: 15px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        user-select: none;
-      }
-      .button:hover {
-        background-color: #78b87a; /* Green */
-      }
-      .button:focus {
-        background-color: #78b87a;
-      }
-    </style>
+    <link rel="stylesheet" href="./src/styles.css"/>
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@3/dist/index.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@3/dist/plugins.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@3/dist/index.umd.js"></script>
@@ -123,75 +24,31 @@
       <header class="border flex justify-left items-center m-2 border-none">
         <img src="./data/logo-zea.svg" id="logo"></img>
       </header>
-      <main class="splitter">
-        <div id="leftPanel">
-          <scene-tree-view
-            id="tree"
-            class="max-w-full max-h-full select-none"
-          ></scene-tree-view>
-        </div>
-        <div id="separator"></div>
-        <div id="mainPanel">
-          <div id="canvas-holder">
-            <canvas id="canvas"> </canvas>
+      <main>
+        <div class="splitter">
+          <div id="leftPanel">
+            <scene-tree-view id="tree" class="select-none"></scene-tree-view>
           </div>
-          <div class="xr-button hidden" id="xr-button"></div>
-          <zea-fps-display id="fps"></zea-fps-display>
-          <progress class="progress-display" id="progress" value="0" max="100">
-            0%
-          </progress>
+          <div class="separator" id="separatorV"></div>
+          <div id="mainPanel">
+            <div id="canvas-holder">
+              <canvas id="canvas" style="position: absolute;"> </canvas>
+            </div>
+            <div class="xr-button hidden" id="xr-button"></div>
+            <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
+            <progress class="progress-display" id="progress" value="0" max="100">
+              0%
+            </progress>
+          </div>
         </div>
       </main>
     </div>
     <script type="module">
-      // A function is used for dragging and moving
-      function dragElement(element, direction) {
-        var md; // remember mouse down info
-        const leftPanel = document.getElementById("leftPanel");
-        const mainPanel = document.getElementById("mainPanel");
-
-        element.onmousedown = onMouseDown;
-
-        function onMouseDown(e) {
-          //console.log("mouse down: " + e.clientX);
-          md = {
-            e,
-            offsetLeft: element.offsetLeft,
-            offsetTop: element.offsetTop,
-            leftPanelWidth: leftPanel.offsetWidth,
-            mainPanelWidth: mainPanel.offsetWidth,
-          };
-
-          document.onmousemove = onMouseMove;
-          document.onmouseup = () => {
-            //console.log("mouse up");
-            document.onmousemove = document.onmouseup = null;
-          };
-        }
-
-        function onMouseMove(e) {
-          //console.log("mouse move: " + e.clientX);
-          var delta = {
-            x: e.clientX - md.e.clientX,
-            y: e.clientY - md.e.clientY,
-          };
-
-          if (direction === "H") {
-            // Horizontal
-            // Prevent negative-sized elements
-            delta.x = Math.min(
-              Math.max(delta.x, -md.leftPanelWidth),
-              md.mainPanelWidth
-            );
-
-            element.style.left = md.offsetLeft + delta.x + "px";
-            leftPanel.style.width = md.leftPanelWidth + delta.x + "px";
-            mainPanel.style.width = md.mainPanelWidth - delta.x + "px";
-          }
-        }
-      }
-
-      dragElement(document.getElementById("separator"), "H");
+      import dragElement from './src/panels.js'
+      const separatorV = document.getElementById("separatorV");
+      const leftPanel = document.getElementById("leftPanel");
+      const mainPanel = document.getElementById("mainPanel");
+      dragElement(separatorV, leftPanel, mainPanel, "H");
     </script>
 
     <script type="module">
