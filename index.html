@@ -19,11 +19,20 @@
     <script src="./src/zea-fps-display.js" type="module"></script>
     <script src="./src/scene-tree-view.js" type="module"></script>
     <script src="./src/login-dialog.js" type="module"></script>
+    <script src="./src/avatar.js" type="module"></script>
   </head>
   <body class="overflow-hidden">
-    <div class="layout grid h-screen">
-      <header class="border flex justify-left items-center m-2 border-none">
-        <img src="./data/logo-zea.svg" id="logo"></img>
+    <div class="main-layout grid h-screen">
+      <header class="border flex items-center m-1 border-none">
+        <div class="logo">
+          <img src="./data/logo-zea.svg" id="logoImg"></img>
+        </div>
+        <div class="menus">
+          
+        </div>
+        <div class="userchip">
+          <!-- <zea-avatar></zea-avatar> -->
+        </div>
       </header>
       <main>
         <div class="splitter">

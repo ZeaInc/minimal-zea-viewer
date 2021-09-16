@@ -4,23 +4,43 @@ body {
   margin: 0em;
   background-color: #2d2d2d;
 }
-.layout {
+.main-layout {
   grid-template-areas:
     "header"
     "main";
   grid-template-rows: 50px 1fr;
 }
 
+/* ==== HEADER ==== */
 header {
   grid-area: header;
+  grid-template-areas:
+    "logo"
+    "menus"
+    "userchip";
+  grid-template-rows: 30px 1fr 20px;
   overflow: hidden;
 }
+
+.logo {
+  grid-area: logo;
+}
+#logoImg {
+  height: 28px;
+  grid-area: logo;
+}
+.menus {
+  width: 100%;
+  grid-area: menus;
+}
+.userchip {
+  grid-area: userchip;
+}
+
+/* ==== MAIN ==== */
 main {
   grid-area: main;
   position: relative;
-}
-#logo {
-  height: 25px;
 }
 
 .splitter {
