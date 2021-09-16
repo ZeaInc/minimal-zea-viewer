@@ -6,6 +6,7 @@ const HASHED_PASSWORD =
 
 // To disable authentication, set `shouldAuthenticate` to false.
 const shouldAuthenticate = true;
+const shouldProvideRoomID = true;
 
 async function sha256(message) {
   // encode as UTF-8
@@ -27,9 +28,10 @@ async function sha256(message) {
 class Auth {
   async isAuthenticated() {
     const userData = await this.getUserData();
-    return userData && userData.hashedPassword === HASHED_PASSWORD;
-
-    return true;
+    return (
+      userData &&
+      (userData.hashedPassword === HASHED_PASSWORD || !shouldAuthenticate)
+    );
   }
 
   async getUserData() {
@@ -43,8 +45,10 @@ class Auth {
         throw new Error("Password not provided.");
       }
 
-      userData.hashedPassword = await sha256(userData.password);
-      delete userData.password;
+      if (userData.hashedPassword !== HASHED_PASSWORD) {
+        userData.hashedPassword = await sha256(userData.password);
+        userData.password = "".padEnd(6, "*");
+      }
 
       if (userData.hashedPassword !== HASHED_PASSWORD) {
         throw new Error("Wrong password.");
@@ -62,3 +66,4 @@ class Auth {
 const auth = new Auth();
 
 export default auth;
+export { auth, shouldAuthenticate, shouldProvideRoomID };

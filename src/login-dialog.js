@@ -1,4 +1,4 @@
-import auth from "./auth.js";
+import { auth, shouldAuthenticate, shouldProvideRoomID } from "./auth.js";
 const { Color } = window.zeaEngine;
 
 export const getRandomString = (charCount = 3) =>
@@ -39,60 +39,73 @@ class LoginDialog extends HTMLElement {
           <label for="uname"><b>Username</b></label>
           <input id="uname" type="text" placeholder="Enter Username" name="uname" required>
 
-          <label for="psw"><b>Password</b></label>
-          <input id="psw" type="password" placeholder="Enter Password" name="psw" required>
+          ${
+            shouldAuthenticate
+              ? `<label for="psw"><b>Password</b></label>
+          <input id="psw" type="password" placeholder="Enter Password" name="psw" required>`
+              : ``
+          }
 
-          <label for="room"><b>Room ID</b></label>
-          <input id="room" type="text" placeholder="Enter Room ID" name="room" required>
+          ${
+            shouldProvideRoomID
+              ? `<label for="room"><b>Room ID</b></label>
+          <input id="room" type="text" placeholder="Enter Room ID" name="room" required>`
+              : ``
+          }
+
 
           <button type="submit" id="login">Login</button>
         </div>`;
 
     const uname = this.shadowRoot.getElementById("uname");
-    const psw = this.shadowRoot.getElementById("psw");
-    psw.addEventListener("input", () => {
-      psw.style.border = "";
-    });
-    const room = this.shadowRoot.getElementById("room");
+    let psw;
+    if (shouldAuthenticate) {
+      psw = this.shadowRoot.getElementById("psw");
+      psw.addEventListener("input", () => {
+        psw.style.border = "";
+      });
+    }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    let roomId = urlParams.has("roomId")
-      ? urlParams.get("roomId")
-      : getRandomRoomId();
+    let room;
+    if (shouldProvideRoomID) {
+      room = this.shadowRoot.getElementById("room");
+      const urlParams = new URLSearchParams(window.location.search);
+      let roomId = urlParams.has("roomId")
+        ? urlParams.get("roomId")
+        : getRandomRoomId();
+      room.value = roomId;
+    }
 
-    room.value = roomId;
-
-    auth.getUserData().then((userData) => {
-      uname.value = userData.firstName;
+    let userData;
+    auth.getUserData().then((result) => {
+      userData = result ? result : {};
+      if (result) {
+        psw.value = result.password;
+        uname.value = result.firstName;
+      }
     });
 
     // When the user clicks on <span> (x), close the modal
     const loginBtn = this.shadowRoot.getElementById("login");
     loginBtn.onclick = async () => {
       const userId = getRandomString();
-      const userData = {
-        color: Color.random().toHex(),
-        firstName: uname.value,
-        id: userId.value,
-        lastName: "",
-        password: psw.value,
-        username: uname.value,
-      };
+      userData.color = Color.random().toHex();
+      userData.firstName = uname.value;
+      userData.id = userId.value;
+      userData.lastName = "";
+      userData.password = shouldAuthenticate ? psw.value : "";
+      userData.username = uname.value;
 
-      if (room.value) setURLParam("roomId", room.value);
+      if (shouldProvideRoomID && room.value) setURLParam("roomId", room.value);
 
       try {
         await auth.setUserData(userData);
       } catch (e) {
+        // Authentication failed.
         psw.style.border = "2px solid #f00";
         return;
       }
-      // if (!auth.isAuthenticated()) {
-      //   psw.style.border = "2px solid #f00";
-      //   return;
-      // }
-      this.modal.style.display = "none";
-      this.onCloseCallback();
+      this.close();
     };
 
     const styleTag = document.createElement("style");
@@ -210,8 +223,28 @@ span.psw {
   }
 
   show(onCloseCallback) {
-    this.modal.style.display = "block";
     this.onCloseCallback = onCloseCallback;
+
+    // Under a few conditions we don't need to display the dialog.
+    // 1. A room id is required, and provided and cached authentication passes.
+    // 2. a room id is not required, and cached authentication passes.
+    const urlParams = new URLSearchParams(window.location.search);
+    if (shouldAuthenticate && !shouldProvideRoomID) {
+      auth.isAuthenticated().then((result) => {
+        if (result) this.close();
+      });
+    } else if (shouldProvideRoomID && urlParams.has("roomId")) {
+      auth.isAuthenticated().then((result) => {
+        if (result) this.close();
+      });
+    }
+
+    this.modal.style.display = "block";
+  }
+
+  close() {
+    this.modal.style.display = "none";
+    this.onCloseCallback();
   }
 }
 
