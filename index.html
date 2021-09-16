@@ -18,6 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@3/dist/index.umd.js"></script>
     <script src="./src/zea-fps-display.js" type="module"></script>
     <script src="./src/scene-tree-view.js" type="module"></script>
+    <script src="./src/login-dialog.js" type="module"></script>
   </head>
   <body class="overflow-hidden">
     <div class="layout grid h-screen">
@@ -43,6 +44,7 @@
         </div>
       </main>
     </div>
+    <login-dialog id="login" class="select-none"></login-dialog>
     <script type="module">
       import dragElement from './src/panels.js'
       const separatorV = document.getElementById("separatorV");
@@ -53,8 +55,17 @@
 
     <script type="module">
       import init from './src/init.js'
-      
-      init()
+
+      if (false) {
+        // Show the login page.
+        const login = document.getElementById("login");
+        login.show(()=> {
+          // When it is closed, init the scene.
+          init()
+        })
+      } else {
+        init()
+      }
     </script>
   </body>
 </html>
