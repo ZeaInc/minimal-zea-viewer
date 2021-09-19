@@ -207,11 +207,7 @@ class TreeItemView extends HTMLElement {
     const children = this.treeItem.getChildren();
     let count = 0;
     children.forEach((childItem, index) => {
-      if (
-        childItem instanceof TreeItem &&
-        childItem.getSelectable() &&
-        !(childItem instanceof CADBody)
-      ) {
+      if (childItem instanceof TreeItem && childItem.getSelectable()) {
         count++;
       }
     });
@@ -229,11 +225,7 @@ class TreeItemView extends HTMLElement {
     if (!this.childrenAlreadyCreated) {
       const children = this.treeItem.getChildren();
       children.forEach((childItem, index) => {
-        if (
-          childItem instanceof TreeItem &&
-          childItem.getSelectable() &&
-          !(childItem instanceof CADBody)
-        ) {
+        if (childItem instanceof TreeItem && childItem.getSelectable()) {
           this.addChild(childItem, index);
         }
       });
