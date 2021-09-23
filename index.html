@@ -13,8 +13,8 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css"
     />
     <link rel="stylesheet" href="./src/styles.css"/>
-    <!-- <script src="http://localhost:8000/dist/index.umd.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@3/dist/index.umd.js"></script>
+    <!-- <script src="http://localhost:8001/dist/index.umd.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@3.11/dist/index.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@3/dist/index.umd.js"></script>
     <script src="./src/zea-fps-display.js" type="module"></script>
     <script src="./src/scene-tree-view.js" type="module"></script>
@@ -31,9 +31,9 @@
             <scene-tree-view id="tree" class="select-none"></scene-tree-view>
           </div>
           <div class="separator" id="separatorV"></div>
-          <div id="mainPanel">
+          <div id="mainPanel" class="flex-1">
             <div id="canvas-holder">
-              <canvas id="canvas" style="position: absolute;"> </canvas>
+              <canvas id="canvas"> </canvas>
             </div>
             <div class="xr-button hidden" id="xr-button"></div>
             <zea-fps-display class="fps-display" id="fps"></zea-fps-display>

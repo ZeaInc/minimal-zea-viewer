@@ -40,7 +40,7 @@ function dragElement(element, leftPanel, mainPanel, direction) {
 
       element.style.left = md.offsetLeft + delta.x + "px";
       leftPanel.style.width = md.leftPanelWidth + delta.x + "px";
-      mainPanel.style.width = md.mainPanelWidth - delta.x + "px";
+      // mainPanel.style.width = md.mainPanelWidth - delta.x + "px";
     } else if (direction === "V") {
       // Vertical
       // Prevent negative-sized elements
@@ -51,7 +51,7 @@ function dragElement(element, leftPanel, mainPanel, direction) {
 
       element.style.top = md.offsetLeft + delta.y + "px";
       leftPanel.style.height = md.leftPanelHeight + delta.y + "px";
-      mainPanel.style.height = md.mainPanelHeight - delta.y + "px";
+      // mainPanel.style.height = md.mainPanelHeight - delta.y + "px";
     }
   }
 }

@@ -11,6 +11,7 @@ export default function init() {
     GeomItem,
     MeshProxy,
     LinesProxy,
+    Registry,
   } = zeaEngine;
   const { CADAsset, CADBody } = zeaCad;
 
@@ -21,6 +22,42 @@ export default function init() {
   const renderer = new GLRenderer(document.getElementById("canvas"), {
     debugGeomIds: false,
   });
+
+  // //////////////////////////////////////////////////////
+  // Temporary fix till the next point release comes out.
+  // This code will be part of 3.11.2
+  let lastResize = performance.now();
+  let timoutId = 0;
+  const handleResize = renderer.handleResize.bind(renderer);
+  renderer.handleResize = (width, height) => {
+    // Note: Rapid resize events would cause WebGL to render black.
+    // There appeared nothing to indicate why we get black, but throttling
+    // the resizing of our canvas and buffers seems to work.
+    const now = performance.now();
+    if (now - lastResize > 100) {
+      lastResize = now;
+      // If a delayed resize is scheduled, cancel it.
+      if (timoutId) {
+        clearTimeout(timoutId);
+        timoutId = 0;
+      }
+      handleResize(width, height);
+    } else {
+      // Set a timer to see if we can delay this resize by a few ms.
+      // If a resize happens in the meantime that succeeds, then skip this one.
+      // This ensures that after a drag to resize, the final resize event
+      // should always eventually apply.
+      timoutId = setTimeout(() => {
+        const now = performance.now();
+        if (now - lastResize > 100) {
+          lastResize = now;
+          handleResize(width, height);
+        }
+      }, 100);
+    }
+  };
+  // //////////////////////////////////////////////////////
+
   // renderer.solidAngleLimit = 0.0;
   renderer.setScene(scene);
   renderer
