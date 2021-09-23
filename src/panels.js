@@ -50,8 +50,8 @@ function dragElement(element, leftPanel, mainPanel, direction) {
       );
 
       element.style.top = md.offsetLeft + delta.y + "px";
-      leftPanel.style.height = md.leftPanelHeight + delta.y + "px";
-      // mainPanel.style.height = md.mainPanelHeight - delta.y + "px";
+      // leftPanel.style.height = md.leftPanelHeight + delta.y + "px";
+      mainPanel.style.height = md.mainPanelHeight - delta.y + "px";
     }
   }
 }

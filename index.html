@@ -25,7 +25,8 @@
       <header class="border flex justify-left items-center m-2 border-none">
         <img src="./data/logo-zea.svg" id="logo"></img>
       </header>
-      <main>
+      <main class="flex flex-col">
+        <div id="topPanel" class="flex-1">
         <div class="splitter">
           <div id="leftPanel">
             <scene-tree-view id="tree" class="select-none"></scene-tree-view>
@@ -42,7 +43,13 @@
             </progress>
           </div>
         </div>
-      </main>
+      </div>
+      <!-- Uncomment these lines to provide a resizable bottom panel
+      <div class="separator" id="separatorH"></div>
+      <div id="bottomPanel">
+      </div> 
+       -->
+    </main>
     </div>
     <login-dialog id="login" class="select-none"></login-dialog>
     <script type="module">
@@ -51,6 +58,13 @@
       const leftPanel = document.getElementById("leftPanel");
       const mainPanel = document.getElementById("mainPanel");
       dragElement(separatorV, leftPanel, mainPanel, "H");
+      
+      const separatorH = document.getElementById("separatorH");
+      const topPanel = document.getElementById("topPanel");
+      const bottomPanel = document.getElementById("bottomPanel");
+      if (separatorH && topPanel && bottomPanel)  {
+        dragElement(separatorH, topPanel, bottomPanel, "V");
+      }
     </script>
 
     <script type="module">
