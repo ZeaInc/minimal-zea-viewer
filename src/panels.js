@@ -24,7 +24,7 @@ function dragElement(element, leftPanel, mainPanel, direction) {
   }
 
   function onMouseMove(e) {
-    //console.log("mouse move: " + e.clientX);
+    // console.log("mouse move: " + e.clientX);
     var delta = {
       x: e.clientX - md.e.clientX,
       y: e.clientY - md.e.clientY,
@@ -43,15 +43,9 @@ function dragElement(element, leftPanel, mainPanel, direction) {
       // mainPanel.style.width = md.mainPanelWidth - delta.x + "px";
     } else if (direction === "V") {
       // Vertical
-      // Prevent negative-sized elements
-      delta.y = Math.min(
-        Math.max(delta.y, -md.leftPanelHeight),
-        md.mainPanelHeight - 20
-      );
-
-      element.style.top = md.offsetLeft + delta.y + "px";
-      // leftPanel.style.height = md.leftPanelHeight + delta.y + "px";
+      // element.style.top = md.offsetLeft + delta.y + "px";
       mainPanel.style.height = md.mainPanelHeight - delta.y + "px";
+      // mainPanel.style.height = md.mainPanelHeight - delta.y + "px";
     }
   }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="h-full">
   <head>
     <title>Zea CAD Viewer</title>
     <link
@@ -20,49 +20,51 @@
     <script src="./src/scene-tree-view.js" type="module"></script>
     <script src="./src/login-dialog.js" type="module"></script>
   </head>
-  <body class="overflow-hidden">
-    <div class="layout grid h-screen">
-      <header class="border flex justify-left items-center m-2 border-none">
+
+  <body class="overflow-hidden h-full">
+    <div class="h-full flex flex-col">
+      <header class="p-2">
         <img src="./data/logo-zea.svg" id="logo"></img>
       </header>
-      <main class="flex flex-col">
-        <div id="topPanel" class="flex-1">
-        <div class="splitter">
-          <div id="leftPanel">
-            <scene-tree-view id="tree" class="select-none"></scene-tree-view>
-          </div>
-          <div class="separator" id="separatorV"></div>
-          <div id="mainPanel" class="flex-1">
-            <div id="canvas-holder">
-              <canvas id="canvas"> </canvas>
+      <main class="flex flex-col flex-1">
+        <div class="flex-1" id="topPanel">
+          <div class="splitter">
+            <div id="leftPanel">
+              <scene-tree-view
+                id="tree"
+                class="select-none"
+              ></scene-tree-view>
             </div>
-            <div class="xr-button hidden" id="xr-button"></div>
-            <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
-            <progress class="progress-display" id="progress" value="0" max="100">
-              0%
-            </progress>
+            <div class="separator" id="separatorV"></div>
+            <div id="mainPanel" class="flex-1">
+              <div id="canvas-holder">
+                <canvas id="canvas" > </canvas>
+              </div>
+              <div class="xr-button hidden" id="xr-button"></div>
+              <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
+              <progress class="progress-display" id="progress" value="0" max="100">
+                0%
+              </progress>
+            </div>
           </div>
         </div>
-      </div>
-      <!-- Uncomment these lines to provide a resizable bottom panel -->
-      <div class="separator" id="separatorH"></div>
-      <div id="bottomPanel">
-      </div> 
-       
-    </main>
+        <!-- Uncomment these lines to provide a resizable bottom panel
+        <div class="separator" id="separatorH"></div>
+        <div id="bottomPanel">
+        </div> -->
+      </main>
     </div>
-    <login-dialog id="login" class="select-none"></login-dialog>
     <script type="module">
       import dragElement from './src/panels.js'
       const separatorV = document.getElementById("separatorV");
       const leftPanel = document.getElementById("leftPanel");
       const mainPanel = document.getElementById("mainPanel");
       dragElement(separatorV, leftPanel, mainPanel, "H");
-      
+
       const separatorH = document.getElementById("separatorH");
       const topPanel = document.getElementById("topPanel");
       const bottomPanel = document.getElementById("bottomPanel");
-      if (separatorH && topPanel && bottomPanel)  {
+      if (separatorH && topPanel && bottomPanel) {
         dragElement(separatorH, topPanel, bottomPanel, "V");
       }
     </script>
