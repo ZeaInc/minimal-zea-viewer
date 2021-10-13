@@ -140,43 +140,57 @@ export default function init() {
 
   // ////////////////////////////////////////////
   // Load the asset
-
-  const asset = new CADAsset();
-  const zcad = urlParams.has("zcad")
-    ? urlParams.get("zcad")
-    : "../data/HC_SRO4.zcad";
-  if (zcad) {
-    asset.load(zcad).then(() => {
-      let count = 0;
-      asset.traverse((item) => {
-        if (item instanceof GeomItem) {
-          count++;
-        }
-      });
-      console.log("Done GeomItems:", count);
-      asset.getGeometryLibrary().on("loaded", () => {
-        let triangles = 0;
-        let lines = 0;
+  function loadcadasset(zcad, framecamera) {
+    const asset = new CADAsset();
+    // const zcad = urlParams.has("zcad")
+    //   ? urlParams.get("zcad")
+    //   : "../data/HC_SRO4.zcad";
+    if (zcad) {
+      asset.load(zcad).then(() => {
+        let count = 0;
         asset.traverse((item) => {
           if (item instanceof GeomItem) {
-            const geom = item.getParameter("Geometry").getValue();
-            if (geom instanceof LinesProxy) {
-              lines += geom.__buffers.indices.length / 2;
-            }
-            if (geom instanceof MeshProxy) {
-              triangles += geom.__buffers.indices.length / 3;
-            }
+            count++;
           }
         });
-        console.log("lines: ", lines, " triangles: ", triangles);
+        console.log("Done GeomItems:", count);
+        asset.getGeometryLibrary().on("loaded", () => {
+          let triangles = 0;
+          let lines = 0;
+          asset.traverse((item) => {
+            if (item instanceof GeomItem) {
+              const geom = item.getParameter("Geometry").getValue();
+              if (geom instanceof LinesProxy) {
+                lines += geom.__buffers.indices.length / 2;
+              }
+              if (geom instanceof MeshProxy) {
+                triangles += geom.__buffers.indices.length / 3;
+              }
+            }
+          });
+          console.log("lines: ", lines, " triangles: ", triangles);
+        });
+        if (framecamera)
+          renderer.getViewport().frameView([asset]);
+        //renderer.frameAll();
       });
-      renderer.frameAll();
-    });
+    }
+
+    scene.getRoot().addChild(asset);
+
+    // const xfo = new Xfo();
+    // xfo.ori.setFromEulerAngles(new EulerAngles(90 * (Math.PI / 180), 0, 0));
+    // asset.getParameter("GlobalXfo").setValue(xfo);
   }
 
-  scene.getRoot().addChild(asset);
+  //load default sample part
+  //loadcadasset("./data/HC_SRO4.zcad", false);
 
-  const xfo = new Xfo();
-  xfo.ori.setFromEulerAngles(new EulerAngles(90 * (Math.PI / 180), 0, 0));
-  asset.getParameter("GlobalXfo").setValue(xfo);
+  //uncomment to load large automobile assembly
+  loadcadasset("./data/01 dipan/01 dipan.zcad", false);
+  loadcadasset("./data/02 dongli/02 dongli.zcad", false);
+  loadcadasset("./data/03 cheshen/03 cheshen.zcad", true);
+  loadcadasset("./data/04 fujian/04 fujian.zcad", false);
+  loadcadasset("./data/05 dianqi/05 dianqi.zcad", false);
+
 }
