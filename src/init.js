@@ -6,6 +6,7 @@ export default function init() {
     Xfo,
     Scene,
     GLRenderer,
+    CameraManipulator,
     EnvMap,
     resourceLoader,
     GeomItem,
@@ -64,6 +65,14 @@ export default function init() {
     .getViewport()
     .getCamera()
     .setPositionAndTarget(new Vec3(12, 12, 10), new Vec3(0, 0, 1.5));
+
+  /*
+    Change Camera Manipulation mode
+  */
+  renderer
+    .getViewport()
+    .getManipulator()
+    .setDefaultManipulationMode(CameraManipulator.MANIPULATION_MODES.turntable);
 
   const envMap = new EnvMap();
   envMap.load("../data/StudioG.zenv");
@@ -179,12 +188,16 @@ export default function init() {
     scene.getRoot().addChild(asset);
 
     // const xfo = new Xfo();
-    // xfo.ori.setFromEulerAngles(new EulerAngles(90 * (Math.PI / 180), 0, 0));
+    // // xfo.ori.setFromEulerAngles(new EulerAngles(90 * (Math.PI / 180), 0, 0));
+    // xfo.ori.setFromEulerAngles(new EulerAngles(180 * (Math.PI / 180), 90 * (Math.PI / 180), 0 * (Math.PI / 180))); //for PressRink
     // asset.getParameter("GlobalXfo").setValue(xfo);
   }
 
   //load default sample part
-  //loadcadasset("./data/HC_SRO4.zcad", false);
+  //loadcadasset("./data/HC_SRO4.zcad", true);
+
+  //load default sample part
+  //loadcadasset("./data/PressRink.zcad", true);
 
   //uncomment to load large automobile assembly
   loadcadasset("./data/01 dipan/01 dipan.zcad", false);
