@@ -1,9 +1,8 @@
+/* eslint-disable require-jsdoc */
 export default function init() {
   const {
     Color,
     Vec3,
-    EulerAngles,
-    Xfo,
     Scene,
     GLRenderer,
     EnvMap,
@@ -11,7 +10,7 @@ export default function init() {
     GeomItem,
     MeshProxy,
     LinesProxy,
-    Registry,
+    AssetLoadContext,
   } = zeaEngine;
   const { CADAsset, CADBody } = zeaCad;
 
@@ -23,41 +22,6 @@ export default function init() {
     debugGeomIds: false,
   });
 
-  // //////////////////////////////////////////////////////
-  // Temporary fix till the next point release comes out.
-  // This code will be part of 3.11.2
-  let lastResize = performance.now();
-  let timoutId = 0;
-  const handleResize = renderer.handleResize.bind(renderer);
-  renderer.handleResize = (width, height) => {
-    // Note: Rapid resize events would cause WebGL to render black.
-    // There appeared nothing to indicate why we get black, but throttling
-    // the resizing of our canvas and buffers seems to work.
-    const now = performance.now();
-    if (now - lastResize > 100) {
-      lastResize = now;
-      // If a delayed resize is scheduled, cancel it.
-      if (timoutId) {
-        clearTimeout(timoutId);
-        timoutId = 0;
-      }
-      handleResize(width, height);
-    } else {
-      // Set a timer to see if we can delay this resize by a few ms.
-      // If a resize happens in the meantime that succeeds, then skip this one.
-      // This ensures that after a drag to resize, the final resize event
-      // should always eventually apply.
-      timoutId = setTimeout(() => {
-        const now = performance.now();
-        if (now - lastResize > 100) {
-          lastResize = now;
-          handleResize(width, height);
-        }
-      }, 100);
-    }
-  };
-  // //////////////////////////////////////////////////////
-
   // renderer.solidAngleLimit = 0.0;
   renderer.setScene(scene);
   renderer
@@ -66,7 +30,7 @@ export default function init() {
     .setPositionAndTarget(new Vec3(12, 12, 10), new Vec3(0, 0, 1.5));
 
   const envMap = new EnvMap();
-  envMap.load("../data/StudioG.zenv");
+  envMap.load("./data/StudioG.zenv");
   scene.setEnvMap(envMap);
 
   // Setup FPS Display
@@ -75,30 +39,53 @@ export default function init() {
 
   // Setup TreeView Display
   const treeElement = document.getElementById("tree");
-  treeElement.setTreeItem(scene.getRoot());
+  treeElement.setTreeItem(scene.getRoot(), {
+    scene,
+    renderer,
+  });
 
-  let highlightedItem;
+  // let highlightedItem
   const highlightColor = new Color("#F9CE03");
   highlightColor.a = 0.1;
   const filterItem = (item) => {
     while (item && !(item instanceof CADBody)) item = item.getOwner();
     return item;
   };
-  renderer.getViewport().on("pointerOverGeom", (event) => {
-    highlightedItem = filterItem(event.intersectionData.geomItem);
-    if (highlightedItem)
-      highlightedItem.addHighlight("pointerOverGeom", highlightColor, true);
-  });
-  renderer.getViewport().on("pointerLeaveGeom", (event) => {
-    if (highlightedItem) {
-      highlightedItem.removeHighlight("pointerOverGeom", true);
-      highlightedItem = null;
-    }
-  });
+  // renderer.getViewport().on('pointerOverGeom', (event) => {
+  //   highlightedItem = filterItem(event.intersectionData.geomItem)
+  //   if (highlightedItem) highlightedItem.addHighlight('pointerOverGeom', highlightColor, true)
+  // })
+  // renderer.getViewport().on('pointerLeaveGeom', (event) => {
+  //   if (highlightedItem) {
+  //     highlightedItem.removeHighlight('pointerOverGeom', true)
+  //     highlightedItem = null
+  //   }
+  // })
   renderer.getViewport().on("pointerDown", (event) => {
     if (event.intersectionData) {
       const geomItem = filterItem(event.intersectionData.geomItem);
-      console.log(geomItem.getPath());
+      if (geomItem) {
+        console.log(geomItem.getPath());
+
+        const geom = event.intersectionData.geomItem
+          .getParameter("Geometry")
+          .getValue();
+        console.log(
+          geom.getNumVertices(),
+          event.intersectionData.geomItem.geomIndex
+        );
+        // const globalXfo = event.intersectionData.geomItem
+        //   .getParameter("GlobalXfo")
+        //   .getValue();
+        // console.log(globalXfo.sc.toString());
+
+        let item = event.intersectionData.geomItem;
+        while (item) {
+          const globalXfo = item.getParameter("LocalXfo").getValue();
+          console.log(item.getName(), globalXfo.sc.toString());
+          item = item.getOwner();
+        }
+      }
     }
   });
 
@@ -143,18 +130,16 @@ export default function init() {
 
   // ////////////////////////////////////////////
   // Load the asset
+  const loadCADfile = (zcad) => {
+    const asset = new CADAsset();
 
-  const asset = new CADAsset();
-  const zcad = urlParams.has("zcad")
-    ? urlParams.get("zcad")
-    : "../data/HC_SRO4.zcad";
-  if (zcad) {
-    asset.load(zcad).then(() => {
+    const context = new AssetLoadContext();
+    context.camera = renderer.getViewport().getCamera();
+    asset.load(zcad, context).then(() => {
       const materials = asset.getMaterialLibrary().getMaterials();
       materials.forEach((material) => {
         const BaseColor = material.getParameter("BaseColor");
         if (BaseColor) BaseColor.setValue(BaseColor.getValue().toGamma());
-        console.log(material.getShaderName());
         const Reflectance = material.getParameter("Reflectance");
         if (Reflectance) Reflectance.setValue(0.01);
         const Metallic = material.getParameter("Metallic");
@@ -188,7 +173,21 @@ export default function init() {
       });
       renderer.frameAll();
     });
+    scene.getRoot().addChild(asset);
+  };
+
+  if (urlParams.has("zcad")) {
+    loadCADfile(urlParams.get("zcad"));
+    const dropZone = document.getElementById("dropZone");
+    if (dropZone) dropZone.hide();
+  } else {
+    const dropZone = document.getElementById("dropZone");
+    dropZone.display((url, filename) => {
+      loadCADfile(url);
+    });
   }
 
-  scene.getRoot().addChild(asset);
+  // const xfo = new Xfo();
+  // xfo.ori.setFromEulerAngles(new EulerAngles(90 * (Math.PI / 180), 0, 0));
+  // asset.getParameter("GlobalXfo").setValue(xfo);
 }
