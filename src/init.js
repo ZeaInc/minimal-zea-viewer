@@ -150,6 +150,19 @@ export default function init() {
     : "../data/HC_SRO4.zcad";
   if (zcad) {
     asset.load(zcad).then(() => {
+      const materials = asset.getMaterialLibrary().getMaterials();
+      materials.forEach((material) => {
+        const BaseColor = material.getParameter("BaseColor");
+        if (BaseColor) BaseColor.setValue(BaseColor.getValue().toGamma());
+        console.log(material.getShaderName());
+        const Reflectance = material.getParameter("Reflectance");
+        if (Reflectance) Reflectance.setValue(0.01);
+        const Metallic = material.getParameter("Metallic");
+        if (Metallic) Metallic.setValue(0.9);
+        const Roughness = material.getParameter("Roughness");
+        if (Roughness) Roughness.setValue(0.9);
+      });
+
       let count = 0;
       asset.traverse((item) => {
         if (item instanceof GeomItem) {
@@ -178,8 +191,4 @@ export default function init() {
   }
 
   scene.getRoot().addChild(asset);
-
-  const xfo = new Xfo();
-  xfo.ori.setFromEulerAngles(new EulerAngles(90 * (Math.PI / 180), 0, 0));
-  asset.getParameter("GlobalXfo").setValue(xfo);
 }
