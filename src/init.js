@@ -86,11 +86,14 @@ export default function init() {
   };
   renderer.getViewport().on("pointerOverGeom", (event) => {
     highlightedItem = filterItem(event.intersectionData.geomItem);
-    highlightedItem.addHighlight("pointerOverGeom", highlightColor, true);
+    if (highlightedItem)
+      highlightedItem.addHighlight("pointerOverGeom", highlightColor, true);
   });
   renderer.getViewport().on("pointerLeaveGeom", (event) => {
-    highlightedItem.removeHighlight("pointerOverGeom", true);
-    highlightedItem = null;
+    if (highlightedItem) {
+      highlightedItem.removeHighlight("pointerOverGeom", true);
+      highlightedItem = null;
+    }
   });
   renderer.getViewport().on("pointerDown", (event) => {
     if (event.intersectionData) {
