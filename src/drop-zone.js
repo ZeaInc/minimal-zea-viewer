@@ -1,17 +1,17 @@
-let fileLoaded = false;
+let fileLoaded = false
 
 class DropZone extends HTMLElement {
   constructor() {
-    super();
-    const shadowRoot = this.attachShadow({ mode: "open" });
+    super()
+    const shadowRoot = this.attachShadow({ mode: 'open' })
 
-    this.modal = document.createElement("div");
-    this.modal.classList.add("modal");
-    shadowRoot.appendChild(this.modal);
+    this.modal = document.createElement('div')
+    this.modal.classList.add('modal')
+    shadowRoot.appendChild(this.modal)
 
-    this.content = document.createElement("div");
-    this.content.classList.add("modal-content");
-    this.modal.appendChild(this.content);
+    this.content = document.createElement('div')
+    this.content.classList.add('modal-content')
+    this.modal.appendChild(this.content)
 
     this.content.innerHTML = `<div id="fileDropZone" class="fixed w-full flex h-screen">
     <input
@@ -31,64 +31,64 @@ class DropZone extends HTMLElement {
           </div>
         </div>
       </div>
-  </div>`;
+  </div>`
     // const fileDropZone = this.shadowRoot.getElementById("fileDropZone");
 
     // Based on this answer: https://stackoverflow.com/a/61417954
     const dragEnter = (ev) => {
       // To enable the drop zone to
       if (fileLoaded) {
-        const fileDropZone = this.shadowRoot.getElementById("fileDropZone");
-        fileDropZone.classList.remove("pointer-events-none");
+        const fileDropZone = this.shadowRoot.getElementById('fileDropZone')
+        fileDropZone.classList.remove('pointer-events-none')
       }
-      ev.preventDefault();
-    };
+      ev.preventDefault()
+    }
     const dragOver = (ev) => {
-      ev.preventDefault();
-    };
+      ev.preventDefault()
+    }
 
     const handleDrop = (ev) => {
       for (var i = 0; i < ev.dataTransfer.items.length; i++) {
         // If dropped items aren't files, reject them
-        if (ev.dataTransfer.items[i].kind === "file") {
-          let files = ev.dataTransfer.items[i].getAsFile();
-          console.log(files);
+        if (ev.dataTransfer.items[i].kind === 'file') {
+          let files = ev.dataTransfer.items[i].getAsFile()
+          console.log(files)
           // dispatch("changeFile");
 
-          const reader = new FileReader();
+          const reader = new FileReader()
 
           reader.addEventListener(
-            "load",
+            'load',
             () => {
-              const url = reader.result;
-              const filename = files.name;
-              this.loadFile(url, filename);
+              const url = reader.result
+              const filename = files.name
+              this.loadFile(url, filename)
             },
             false
-          );
+          )
 
-          reader.readAsDataURL(files);
+          reader.readAsDataURL(files)
         }
       }
-      ev.preventDefault();
-    };
+      ev.preventDefault()
+    }
     const handleSelect = (ev) => {
       for (var i = 0; i < ev.target.files.length; i++) {
-        files = ev.target.files[i];
-        console.log(files);
+        files = ev.target.files[i]
+        console.log(files)
         // dispatch("changeFile");
-        this.loadFile(files);
+        this.loadFile(files)
       }
-      ev.preventDefault();
-    };
-    const select = this.shadowRoot.getElementById("dropHotSpot");
-    select.addEventListener("select", handleSelect);
-    select.addEventListener("drop", handleDrop);
-    document.body.addEventListener("dragover", dragOver);
-    document.body.addEventListener("dragenter", dragEnter);
-    document.body.addEventListener("drop", handleDrop);
+      ev.preventDefault()
+    }
+    const select = this.shadowRoot.getElementById('dropHotSpot')
+    select.addEventListener('select', handleSelect)
+    select.addEventListener('drop', handleDrop)
+    document.body.addEventListener('dragover', dragOver)
+    document.body.addEventListener('dragenter', dragEnter)
+    document.body.addEventListener('drop', handleDrop)
 
-    const styleTag = document.createElement("style");
+    const styleTag = document.createElement('style')
     styleTag.appendChild(
       document.createTextNode(`
 /* The Modal (background) */
@@ -116,27 +116,27 @@ class DropZone extends HTMLElement {
 }
 
 `)
-    );
-    shadowRoot.appendChild(styleTag);
+    )
+    shadowRoot.appendChild(styleTag)
   }
 
   display(loadFileCallback) {
-    this.loadFileCallback = loadFileCallback;
-    this.modal.style["pointer-events"] = "auto";
-    this.modal.style["display"] = "block";
+    this.loadFileCallback = loadFileCallback
+    this.modal.style['pointer-events'] = 'auto'
+    this.modal.style['display'] = 'block'
   }
 
   hide() {
     // const fileDropZone = this.shadowRoot.getElementById("fileDropZone");
-    this.modal.style["pointer-events"] = "none";
-    this.modal.style["display"] = "none";
+    this.modal.style['pointer-events'] = 'none'
+    this.modal.style['display'] = 'none'
   }
 
   loadFile(url, filename) {
-    this.hide();
-    fileLoaded = true;
-    if (this.loadFileCallback) this.loadFileCallback(url, filename);
+    this.hide()
+    fileLoaded = true
+    if (this.loadFileCallback) this.loadFileCallback(url, filename)
   }
 }
 
-customElements.define("drop-zone", DropZone);
+customElements.define('drop-zone', DropZone)
