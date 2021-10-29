@@ -116,6 +116,8 @@ export default function init() {
     const asset = new CADAsset()
 
     const context = new AssetLoadContext()
+    // pass the camera in wth the AssetLoadContext so that
+    // PMI classes can bind to it.
     context.camera = renderer.getViewport().getCamera()
     asset.load(zcad, context).then(() => {
       const materials = asset.getMaterialLibrary().getMaterials()
