@@ -1,7 +1,6 @@
 /* eslint-disable require-jsdoc */
 export default function init() {
-  const { Color, Vec3, Scene, GLRenderer, EnvMap, resourceLoader, GeomItem, MeshProxy, LinesProxy, AssetLoadContext } =
-    zeaEngine
+  const { Color, Vec3, Scene, GLRenderer, EnvMap, resourceLoader, AssetLoadContext, ObjAsset } = zeaEngine
   const { CADAsset, CADBody } = zeaCad
 
   const urlParams = new URLSearchParams(window.location.search)
@@ -38,16 +37,6 @@ export default function init() {
     while (item && !(item instanceof CADBody)) item = item.getOwner()
     return item
   }
-  // renderer.getViewport().on('pointerOverGeom', (event) => {
-  //   highlightedItem = filterItem(event.intersectionData.geomItem)
-  //   if (highlightedItem) highlightedItem.addHighlight('pointerOverGeom', highlightColor, true)
-  // })
-  // renderer.getViewport().on('pointerLeaveGeom', (event) => {
-  //   if (highlightedItem) {
-  //     highlightedItem.removeHighlight('pointerOverGeom', true)
-  //     highlightedItem = null
-  //   }
-  // })
   renderer.getViewport().on('pointerDown', (event) => {
     if (event.intersectionData) {
       const geomItem = filterItem(event.intersectionData.geomItem)
@@ -56,11 +45,6 @@ export default function init() {
 
         const geom = event.intersectionData.geomItem.getParameter('Geometry').getValue()
         console.log(geom.getNumVertices(), event.intersectionData.geomItem.geomIndex)
-        // const globalXfo = event.intersectionData.geomItem
-        //   .getParameter("GlobalXfo")
-        //   .getValue();
-        // console.log(globalXfo.sc.toString());
-
         let item = event.intersectionData.geomItem
         while (item) {
           const globalXfo = item.getParameter('LocalXfo').getValue()
@@ -112,7 +96,7 @@ export default function init() {
 
   // ////////////////////////////////////////////
   // Load the asset
-  const loadCADfile = (zcad) => {
+  const loadCADAsset = (zcad, filename) => {
     const asset = new CADAsset()
 
     const context = new AssetLoadContext()
@@ -120,54 +104,58 @@ export default function init() {
     // PMI classes can bind to it.
     context.camera = renderer.getViewport().getCamera()
     asset.load(zcad, context).then(() => {
-      const materials = asset.getMaterialLibrary().getMaterials()
-      materials.forEach((material) => {
-        const BaseColor = material.getParameter('BaseColor')
-        if (BaseColor) BaseColor.setValue(BaseColor.getValue().toGamma())
-        const Reflectance = material.getParameter('Reflectance')
-        if (Reflectance) Reflectance.setValue(0.01)
-        const Metallic = material.getParameter('Metallic')
-        if (Metallic) Metallic.setValue(0.9)
-        const Roughness = material.getParameter('Roughness')
-        if (Roughness) Roughness.setValue(0.9)
-      })
-
-      let count = 0
-      asset.traverse((item) => {
-        if (item instanceof GeomItem) {
-          count++
-        }
-      })
-      console.log('Done GeomItems:', count)
-      asset.getGeometryLibrary().on('loaded', () => {
-        let triangles = 0
-        let lines = 0
-        asset.traverse((item) => {
-          if (item instanceof GeomItem) {
-            const geom = item.getParameter('Geometry').getValue()
-            if (geom instanceof LinesProxy) {
-              lines += geom.__buffers.indices.length / 2
-            }
-            if (geom instanceof MeshProxy) {
-              triangles += geom.__buffers.indices.length / 3
-            }
-          }
-        })
-        console.log('lines: ', lines, ' triangles: ', triangles)
-      })
       renderer.frameAll()
     })
     scene.getRoot().addChild(asset)
+  }
+
+  const loadGLTFAsset = (url, filename) => {
+    const { GLTFAsset } = gltfLoader
+    const asset = new GLTFAsset()
+    asset.load(url, filename).then(() => {
+      renderer.frameAll()
+    })
+    scene.getRoot().addChild(asset)
+    return asset
+  }
+
+  const loadOBJAsset = (url, filename) => {
+    const asset = new ObjAsset()
+    asset.load(url, filename).then(() => {
+      renderer.frameAll()
+    })
+    scene.getRoot().addChild(asset)
+    return asset
+  }
+
+  const loadAsset = (url, filename) => {
+    if (filename.endsWith('zcad')) {
+      return loadCADAsset(url, filename)
+    } else if (filename.endsWith('gltf') || filename.endsWith('glb')) {
+      return loadGLTFAsset(url, filename)
+    } else if (filename.endsWith('obj')) {
+      return loadOBJAsset(url, filename)
+    } else {
+      throw new Error('Unsupported file type:' + filename)
+    }
   }
 
   if (urlParams.has('zcad')) {
     loadCADfile(urlParams.get('zcad'))
     const dropZone = document.getElementById('dropZone')
     if (dropZone) dropZone.hide()
+  } else if (urlParams.has('glb')) {
+    loadGLTFAsset(urlParams.get('glb'))
+    const dropZone = document.getElementById('dropZone')
+    if (dropZone) dropZone.hide()
+  } else if (urlParams.has('obj')) {
+    loadOBJAsset(urlParams.get('obj'))
+    const dropZone = document.getElementById('dropZone')
+    if (dropZone) dropZone.hide()
   } else {
     const dropZone = document.getElementById('dropZone')
     dropZone.display((url, filename) => {
-      loadCADfile(url)
+      loadAsset(url, filename)
     })
   }
 

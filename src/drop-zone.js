@@ -15,7 +15,7 @@ class DropZone extends HTMLElement {
 
     this.content.innerHTML = `<div id="fileDropZone" class="fixed w-full flex h-screen">
     <input
-      accept=".zcad, .gltf, .glb"
+      accept=".zcad, .gltf, .glb, .obj"
       multiple
       type="file"
       class="absolute inset-0 z-50 m-0 p-0 w-full h-full outline-none opacity-0"
@@ -27,7 +27,7 @@ class DropZone extends HTMLElement {
         <div class="m-auto">
           <div class="flex flex-col space-y-2 items-center justify-center">
             <i class="fas fa-cloud-upload-alt fa-3x text-currentColor" />
-            <p class="text-gray-700 text-center">Drag your gltf or zcad files here or click in this area.</p>
+            <p class="text-gray-700 text-center">Drag your gltf, obj or zcad files here or click in this area.</p>
           </div>
         </div>
       </div>
@@ -51,38 +51,36 @@ class DropZone extends HTMLElement {
       for (var i = 0; i < ev.dataTransfer.items.length; i++) {
         // If dropped items aren't files, reject them
         if (ev.dataTransfer.items[i].kind === 'file') {
-          let files = ev.dataTransfer.items[i].getAsFile()
-          console.log(files)
-          // dispatch("changeFile");
-
-          const reader = new FileReader()
-
-          reader.addEventListener(
-            'load',
-            () => {
-              const url = reader.result
-              const filename = files.name
-              this.loadFile(url, filename)
-            },
-            false
-          )
-
-          reader.readAsDataURL(files)
+          const file = ev.dataTransfer.items[i].getAsFile()
+          handlefile(file)
         }
       }
       ev.preventDefault()
     }
     const handleSelect = (ev) => {
       for (var i = 0; i < ev.target.files.length; i++) {
-        files = ev.target.files[i]
-        console.log(files)
-        // dispatch("changeFile");
-        this.loadFile(files)
+        let file = ev.target.files[i]
+        handlefile(file)
       }
       ev.preventDefault()
     }
+    const handlefile = (file) => {
+      const reader = new FileReader()
+
+      reader.addEventListener(
+        'load',
+        () => {
+          const url = reader.result
+          const filename = file.name
+          this.loadFile(url, filename)
+        },
+        false
+      )
+
+      reader.readAsDataURL(file)
+    }
     const select = this.shadowRoot.getElementById('dropHotSpot')
-    select.addEventListener('select', handleSelect)
+    select.addEventListener('change', handleSelect)
     select.addEventListener('drop', handleDrop)
     document.body.addEventListener('dragover', dragOver)
     document.body.addEventListener('dragenter', dragEnter)
