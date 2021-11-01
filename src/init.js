@@ -63,6 +63,13 @@ export default function init() {
     }
   })
 
+  document.addEventListener('keydown', (event) => {
+    if (event.key == 'f') {
+      renderer.frameAll()
+      event.stopPropagation()
+    }
+  })
+
   renderer.getXRViewport().then((xrvp) => {
     fpsElement.style.bottom = '70px'
 
@@ -97,7 +104,7 @@ export default function init() {
   // ////////////////////////////////////////////
   // Load the asset
   const loadCADAsset = (zcad, filename) => {
-    const asset = new CADAsset()
+    const asset = new CADAsset(filename)
 
     const context = new AssetLoadContext()
     // pass the camera in wth the AssetLoadContext so that
@@ -111,7 +118,7 @@ export default function init() {
 
   const loadGLTFAsset = (url, filename) => {
     const { GLTFAsset } = gltfLoader
-    const asset = new GLTFAsset()
+    const asset = new GLTFAsset(filename)
     asset.load(url, filename).then(() => {
       renderer.frameAll()
     })
@@ -120,8 +127,8 @@ export default function init() {
   }
 
   const loadOBJAsset = (url, filename) => {
-    const asset = new ObjAsset()
-    asset.load(url, filename).then(() => {
+    const asset = new ObjAsset(filename)
+    asset.load(url).then(() => {
       renderer.frameAll()
     })
     scene.getRoot().addChild(asset)
