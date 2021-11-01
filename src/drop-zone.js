@@ -15,7 +15,7 @@ class DropZone extends HTMLElement {
 
     this.content.innerHTML = `<div id="fileDropZone" class="fixed w-full flex h-screen">
     <input
-      accept=".zcad, .gltf, .glb, .obj"
+      accept=".zcad, .gltf, .glb, gltf, .obj"
       multiple
       type="file"
       class="absolute inset-0 z-50 m-0 p-0 w-full h-full outline-none opacity-0"

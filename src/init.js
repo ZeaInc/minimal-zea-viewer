@@ -193,8 +193,8 @@ export default function init() {
     loadCADfile(urlParams.get('zcad'))
     const dropZone = document.getElementById('dropZone')
     if (dropZone) dropZone.hide()
-  } else if (urlParams.has('glb')) {
-    loadGLTFAsset(urlParams.get('glb'))
+  } else if (urlParams.has('gltf')) {
+    loadGLTFAsset(urlParams.get('gltf'))
     const dropZone = document.getElementById('dropZone')
     if (dropZone) dropZone.hide()
   } else if (urlParams.has('obj')) {
