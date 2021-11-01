@@ -134,7 +134,7 @@ export default function init() {
         } else if (geom instanceof Mesh) {
           triangles += geom.computeNumTriangles()
         } else if (geom instanceof MeshProxy) {
-          triangles += geom.getNumTriangles()
+          triangles += geom.__buffers.indices ? geom.getNumTriangles() : geom.__buffers.numVertices / 3
         }
       }
     })
