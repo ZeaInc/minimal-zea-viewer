@@ -1,6 +1,20 @@
 /* eslint-disable require-jsdoc */
 export default function init() {
-  const { Color, Vec3, Scene, GLRenderer, EnvMap, resourceLoader, AssetLoadContext, ObjAsset } = zeaEngine
+  const {
+    Color,
+    Vec3,
+    Scene,
+    GLRenderer,
+    EnvMap,
+    resourceLoader,
+    AssetLoadContext,
+    GeomItem,
+    ObjAsset,
+    Lines,
+    LinesProxy,
+    Mesh,
+    MeshProxy,
+  } = zeaEngine
   const { CADAsset, CADBody } = zeaCad
 
   const urlParams = new URLSearchParams(window.location.search)
@@ -105,6 +119,27 @@ export default function init() {
 
   // ////////////////////////////////////////////
   // Load the asset
+  const calcSceneComplexity = () => {
+    let geomItems = 0
+    let triangles = 0
+    let lines = 0
+    scene.getRoot().traverse((item) => {
+      geomItems++
+      if (item instanceof GeomItem) {
+        const geom = item.getParameter('Geometry').getValue()
+        if (geom instanceof Lines) {
+          lines += geom.getNumSegments()
+        } else if (geom instanceof LinesProxy) {
+          lines += geom.getNumLineSegments()
+        } else if (geom instanceof Mesh) {
+          triangles += geom.computeNumTriangles()
+        } else if (geom instanceof MeshProxy) {
+          triangles += geom.getNumTriangles()
+        }
+      }
+    })
+    console.log('geomItems:' + geomItems + ' lines: ' + lines + ' triangles:', triangles)
+  }
   const loadCADAsset = (zcad, filename) => {
     const asset = new CADAsset(filename)
 
@@ -115,6 +150,9 @@ export default function init() {
     asset.load(zcad, context).then(() => {
       renderer.frameAll()
     })
+    asset.getGeometryLibrary().on('loaded', () => {
+      calcSceneComplexity()
+    })
     scene.getRoot().addChild(asset)
   }
 
@@ -122,6 +160,7 @@ export default function init() {
     const { GLTFAsset } = gltfLoader
     const asset = new GLTFAsset(filename)
     asset.load(url, filename).then(() => {
+      calcSceneComplexity()
       renderer.frameAll()
     })
     scene.getRoot().addChild(asset)
@@ -131,6 +170,7 @@ export default function init() {
   const loadOBJAsset = (url, filename) => {
     const asset = new ObjAsset(filename)
     asset.load(url).then(() => {
+      calcSceneComplexity()
       renderer.frameAll()
     })
     scene.getRoot().addChild(asset)
