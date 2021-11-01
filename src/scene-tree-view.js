@@ -268,12 +268,14 @@ class TreeItemView extends HTMLElement {
     }
   }
 
-  childAdded(childItem, index) {
+  childAdded(event) {
+    const { childItem, index } = event
     // if (!childItem.testFlag(ItemFlags.INVISIBLE))
     this.addChild(childItem, index)
   }
 
-  childRemoved(childItem, index) {
+  childRemoved(event) {
+    const { childItem, index } = event
     if (this.expanded) {
       this.itemChildren.children[index].destroy()
       this.itemChildren.removeChild(this.itemChildren.children[index])
@@ -288,14 +290,13 @@ class TreeItemView extends HTMLElement {
    * The destroy method.
    */
   destroy() {
-    this.treeItem.selectedChanged.disconnectId(this.updateSelectedId)
+    this.treeItem.removeListenerById('selectedChanged', this.updateSelectedId)
     if (this.treeItem instanceof TreeItem) {
-      this.treeItem.highlightChanged.disconnectId(this.updateHighlightId)
-      this.treeItem.visibilityChanged.disconnectId(this.updateVisibilityId)
-      this.treeItem.childAdded.disconnectId(this.childAddedId)
-      this.treeItem.childRemoved.disconnectId(this.childRemovedId)
+      this.treeItem.removeListenerById('highlightChanged', this.updateHighlightId)
+      this.treeItem.removeListenerById('visibilityChanged', this.updateVisibilityId)
+      this.treeItem.removeListenerById('childAdded', this.childAddedId)
+      this.treeItem.removeListenerById('childRemoved', this.childRemovedId)
     }
-    // this.parentDomElement.removeChild(this.li);
   }
 }
 
