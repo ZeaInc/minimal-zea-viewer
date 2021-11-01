@@ -9,6 +9,8 @@ export default function init() {
 
   const renderer = new GLRenderer(document.getElementById('canvas'), {
     debugGeomIds: false,
+    /* Enable frustum culling which speeds up rendering on large complex scenes */
+    enableFrustumCulling: true,
   })
 
   // renderer.solidAngleLimit = 0.0;
