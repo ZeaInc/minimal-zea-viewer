@@ -33,6 +33,15 @@ export default function init() {
   renderer.getViewport().getCamera().setPositionAndTarget(new Vec3(12, 12, 10), new Vec3(0, 0, 1.5))
 
   /*
+      Change the Background color
+  */
+      const color = new Color('#7460e1') // this is equivalent to: new Color(116/255, 96/255, 225/255)
+      // get the settings of the scene.
+      const settings = scene.getSettings()
+      // get the "BackgroundColor" parameter and set the value to our color.
+      settings.getParameter('BackgroundColor').setValue(color)
+          
+  /*
     Change Camera Manipulation mode
   */
   renderer
@@ -167,10 +176,10 @@ const loadCADAsset = (zcad, filename, framecamera) => {
     })
     scene.getRoot().addChild(asset)
 
-    // const xfo = new Xfo();
-    // // xfo.ori.setFromEulerAngles(new EulerAngles(90 * (Math.PI / 180), 0, 0));
-    // xfo.ori.setFromEulerAngles(new EulerAngles(180 * (Math.PI / 180), 90 * (Math.PI / 180), 0 * (Math.PI / 180))); //for PressRink
-    // asset.getParameter("GlobalXfo").setValue(xfo);
+    const xfo = new Xfo();
+    // xfo.ori.setFromEulerAngles(new EulerAngles(90 * (Math.PI / 180), 0, 0));
+    xfo.ori.setFromEulerAngles(new EulerAngles(180 * (Math.PI / 180), 90 * (Math.PI / 180), 0 * (Math.PI / 180))); //for PressRink
+    asset.getParameter("GlobalXfo").setValue(xfo);
   }
 
   const loadGLTFAsset = (url, filename) => {
@@ -231,12 +240,12 @@ const loadCADAsset = (zcad, filename, framecamera) => {
   //loadCADAsset("./data/HC_SRO4.zcad", "HC_SRO4.zcad", true);
 
   //load default sample part
-  // loadCADAsset("./data/PressRink.zcad", "PressRink.zcad", true);
+  loadCADAsset("./data/PressRink.zcad", "PressRink.zcad", true);
 
   //uncomment to load large automobile assembly
-  loadCADAsset("./data/01 dipan/01 dipan.zcad", "01 dipan.zcad", false);
-  loadCADAsset("./data/02 dongli/02 dongli.zcad", "02 dongli.zcad", false);
-  loadCADAsset("./data/03 cheshen/03 cheshen.zcad", "03 cheshen.zcad", true);
-  loadCADAsset("./data/04 fujian/04 fujian.zcad", "04 fujian.zcad", false);
-  loadCADAsset("./data/05 dianqi/05 dianqi.zcad", "05 dianqi.zcad", false);
+  // loadCADAsset("./data/01 dipan/01 dipan.zcad", "01 dipan.zcad", false);
+  // loadCADAsset("./data/02 dongli/02 dongli.zcad", "02 dongli.zcad", false);
+  // loadCADAsset("./data/03 cheshen/03 cheshen.zcad", "03 cheshen.zcad", true);
+  // loadCADAsset("./data/04 fujian/04 fujian.zcad", "04 fujian.zcad", false);
+  // loadCADAsset("./data/05 dianqi/05 dianqi.zcad", "05 dianqi.zcad", false);
 }
