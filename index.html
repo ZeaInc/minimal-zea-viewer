@@ -13,11 +13,15 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css"
     />
     <link rel="stylesheet" href="./src/styles.css"/>
-    <!-- <script src="http://localhost:8001/dist/index.umd.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@3.11/dist/index.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@3/dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@3.12.4/dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@3.4.2/dist/index.umd.js"></script>
+
+    <script src="https://www.gstatic.com/draco/v1/decoders/draco_decoder_gltf.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/gltf-loader@3.2.6/dist/index.umd.js"></script>
+
     <script src="./src/zea-fps-display.js" type="module"></script>
     <script src="./src/scene-tree-view.js" type="module"></script>
+    <script src="./src/drop-zone.js" type="module"></script>
     <script src="./src/login-dialog.js" type="module"></script>
   </head>
 
@@ -53,6 +57,7 @@
         <div id="bottomPanel">
         </div> -->
       </main>
+      <drop-zone id="dropZone" class="select-none"></drop-zone>
       <login-dialog id="login" class="select-none"></login-dialog>
     </div>
     <script type="module">
