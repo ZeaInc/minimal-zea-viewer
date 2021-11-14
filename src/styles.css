@@ -2,12 +2,13 @@ body {
   height: 100vh;
   overflow: hidden;
   margin: 0em;
-  background-color: #2d2d2d;
+  background-color: #4d4d4d;
 }
 
 header {
   grid-area: header;
   overflow: hidden;
+  min-height: 40px;
 }
 main {
   grid-area: main;
@@ -108,7 +109,7 @@ progress {
   right: 10px;
   bottom: 10px;
 
-  font-family: "arial";
+  font-family: 'arial';
   background-color: #f9ce03; /* Green */
   border: none;
   color: black;
