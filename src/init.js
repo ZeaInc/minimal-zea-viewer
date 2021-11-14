@@ -158,7 +158,9 @@ const loadCADAsset = (zcad, filename, framecamera) => {
     // PMI classes can bind to it.
     context.camera = renderer.getViewport().getCamera()
     asset.load(zcad, context).then(() => {
-      renderer.frameAll()
+        if (framecamera)
+          renderer.getViewport().frameView([asset]);
+        //renderer.frameAll();
     })
     asset.getGeometryLibrary().on('loaded', () => {
       calcSceneComplexity()
@@ -223,16 +225,18 @@ const loadCADAsset = (zcad, filename, framecamera) => {
     })
   }
 
+  //comment the following code if you want to load via URL params or the drop zone
+  if (dropZone) dropZone.hide()
   //load default sample part
-  //loadCADAsset("HC_SRO4.zcad", "./data/HC_SRO4.zcad", true);
+  //loadCADAsset("./data/HC_SRO4.zcad", "HC_SRO4.zcad", true);
 
   //load default sample part
-  //loadCADAsset("PressRink.zcad", "./data/PressRink.zcad", true);
+  // loadCADAsset("./data/PressRink.zcad", "PressRink.zcad", true);
 
   //uncomment to load large automobile assembly
-  loadCADAsset("01 dipan.zcad", "./data/01 dipan/01 dipan.zcad", false);
-  loadCADAsset("02 dongli.zcad", "./data/02 dongli/02 dongli.zcad", false);
-  loadCADAsset("03 cheshen.zcad", "./data/03 cheshen/03 cheshen.zcad", true);
-  loadCADAsset("04 fujian.zcad", "./data/04 fujian/04 fujian.zcad", false);
-  loadCADAsset("05 dianqi.zcad", "./data/05 dianqi/05 dianqi.zcad", false);
+  loadCADAsset("./data/01 dipan/01 dipan.zcad", "01 dipan.zcad", false);
+  loadCADAsset("./data/02 dongli/02 dongli.zcad", "02 dongli.zcad", false);
+  loadCADAsset("./data/03 cheshen/03 cheshen.zcad", "03 cheshen.zcad", true);
+  loadCADAsset("./data/04 fujian/04 fujian.zcad", "04 fujian.zcad", false);
+  loadCADAsset("./data/05 dianqi/05 dianqi.zcad", "05 dianqi.zcad", false);
 }
