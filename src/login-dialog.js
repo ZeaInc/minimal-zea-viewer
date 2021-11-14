@@ -1,34 +1,34 @@
-import { auth, shouldAuthenticate, shouldProvideRoomID } from "./auth.js";
-const { Color } = window.zeaEngine;
+import { auth, shouldAuthenticate, shouldProvideRoomID } from './auth.js'
+const { Color } = window.zeaEngine
 
 export const getRandomString = (charCount = 3) =>
   Math.random()
     .toString(36)
-    .replace(/[^a-z]+/g, "")
-    .substr(0, charCount);
+    .replace(/[^a-z]+/g, '')
+    .substr(0, charCount)
 
 const getRandomRoomId = () => {
-  return `${getRandomString(3)}-${getRandomString(3)}-${getRandomString(3)}`;
-};
+  return `${getRandomString(3)}-${getRandomString(3)}-${getRandomString(3)}`
+}
 
 const setURLParam = (key, value) => {
-  var url = new URL(window.location.href);
-  url.searchParams.set(key, value);
-  window.history.pushState({}, null, url.href);
-};
+  var url = new URL(window.location.href)
+  url.searchParams.set(key, value)
+  window.history.pushState({}, null, url.href)
+}
 
 class LoginDialog extends HTMLElement {
   constructor() {
-    super();
-    const shadowRoot = this.attachShadow({ mode: "open" });
+    super()
+    const shadowRoot = this.attachShadow({ mode: 'open' })
 
-    this.modal = document.createElement("div");
-    this.modal.classList.add("modal");
-    shadowRoot.appendChild(this.modal);
+    this.modal = document.createElement('div')
+    this.modal.classList.add('modal')
+    shadowRoot.appendChild(this.modal)
 
-    this.modalContent = document.createElement("div");
-    this.modalContent.classList.add("modal-content");
-    this.modal.appendChild(this.modalContent);
+    this.modalContent = document.createElement('div')
+    this.modalContent.classList.add('modal-content')
+    this.modal.appendChild(this.modalContent)
 
     this.modalContent.innerHTML = `
         <div class="imgcontainer">
@@ -55,60 +55,58 @@ class LoginDialog extends HTMLElement {
 
 
           <button type="submit" id="login">Login</button>
-        </div>`;
+        </div>`
 
-    const uname = this.shadowRoot.getElementById("uname");
-    let psw;
+    const uname = this.shadowRoot.getElementById('uname')
+    let psw
     if (shouldAuthenticate) {
-      psw = this.shadowRoot.getElementById("psw");
-      psw.addEventListener("input", () => {
-        psw.style.border = "";
-      });
+      psw = this.shadowRoot.getElementById('psw')
+      psw.addEventListener('input', () => {
+        psw.style.border = ''
+      })
     }
 
-    let room;
+    let room
     if (shouldProvideRoomID) {
-      room = this.shadowRoot.getElementById("room");
-      const urlParams = new URLSearchParams(window.location.search);
-      let roomId = urlParams.has("roomId")
-        ? urlParams.get("roomId")
-        : getRandomRoomId();
-      room.value = roomId;
+      room = this.shadowRoot.getElementById('room')
+      const urlParams = new URLSearchParams(window.location.search)
+      let roomId = urlParams.has('roomId') ? urlParams.get('roomId') : getRandomRoomId()
+      room.value = roomId
     }
 
-    let userData;
+    let userData
     auth.getUserData().then((result) => {
-      userData = result ? result : {};
+      userData = result ? result : {}
       if (result) {
-        psw.value = result.password;
-        uname.value = result.firstName;
+        psw.value = result.password
+        uname.value = result.firstName
       }
-    });
+    })
 
     // When the user clicks on <span> (x), close the modal
-    const loginBtn = this.shadowRoot.getElementById("login");
+    const loginBtn = this.shadowRoot.getElementById('login')
     loginBtn.onclick = async () => {
-      const userId = getRandomString();
-      userData.color = Color.random().toHex();
-      userData.firstName = uname.value;
-      userData.id = userId.value;
-      userData.lastName = "";
-      userData.password = shouldAuthenticate ? psw.value : "";
-      userData.username = uname.value;
+      const userId = getRandomString()
+      userData.color = Color.random().toHex()
+      userData.firstName = uname.value
+      userData.id = userId.value
+      userData.lastName = ''
+      userData.password = shouldAuthenticate ? psw.value : ''
+      userData.username = uname.value
 
-      if (shouldProvideRoomID && room.value) setURLParam("roomId", room.value);
+      if (shouldProvideRoomID && room.value) setURLParam('roomId', room.value)
 
       try {
-        await auth.setUserData(userData);
+        await auth.setUserData(userData)
       } catch (e) {
         // Authentication failed.
-        psw.style.border = "2px solid #f00";
-        return;
+        psw.style.border = '2px solid #f00'
+        return
       }
-      this.close();
-    };
+      this.close()
+    }
 
-    const styleTag = document.createElement("style");
+    const styleTag = document.createElement('style')
     styleTag.appendChild(
       document.createTextNode(`
 /* The Modal (background) */
@@ -218,34 +216,34 @@ span.psw {
 }
 
 `)
-    );
-    shadowRoot.appendChild(styleTag);
+    )
+    shadowRoot.appendChild(styleTag)
   }
 
   show(onCloseCallback) {
-    this.onCloseCallback = onCloseCallback;
+    this.onCloseCallback = onCloseCallback
 
     // Under a few conditions we don't need to display the dialog.
     // 1. A room id is required, and provided and cached authentication passes.
     // 2. a room id is not required, and cached authentication passes.
-    const urlParams = new URLSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(window.location.search)
     if (shouldAuthenticate && !shouldProvideRoomID) {
       auth.isAuthenticated().then((result) => {
-        if (result) this.close();
-      });
-    } else if (shouldProvideRoomID && urlParams.has("roomId")) {
+        if (result) this.close()
+      })
+    } else if (shouldProvideRoomID && urlParams.has('roomId')) {
       auth.isAuthenticated().then((result) => {
-        if (result) this.close();
-      });
+        if (result) this.close()
+      })
     }
 
-    this.modal.style.display = "block";
+    this.modal.style.display = 'block'
   }
 
   close() {
-    this.modal.style.display = "none";
-    this.onCloseCallback();
+    this.modal.style.display = 'none'
+    this.onCloseCallback()
   }
 }
 
-customElements.define("login-dialog", LoginDialog);
+customElements.define('login-dialog', LoginDialog)
