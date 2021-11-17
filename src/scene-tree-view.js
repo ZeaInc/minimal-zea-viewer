@@ -87,7 +87,7 @@ class TreeItemView extends HTMLElement {
     this.titleElement.className = 'TreeNodesListItem__Title'
     this.titleElement.addEventListener('click', (e) => {
       if (!this.appData || !this.appData.selectionManager) {
-        if (!this.treeItem.getSelected()) {
+        if (!this.treeItem.isSelected()) {
           setSelection(this.treeItem, true, this.appData)
         } else {
           setSelection(this.treeItem, false, this.appData)
@@ -186,7 +186,7 @@ class TreeItemView extends HTMLElement {
    *
    */
   updateSelected() {
-    const selected = this.treeItem.getSelected()
+    const selected = this.treeItem.isSelected()
     if (selected) this.itemContainer.classList.add('TreeNodesListItem--isSelected')
     else this.itemContainer.classList.remove('TreeNodesListItem--isSelected')
   }
@@ -213,7 +213,7 @@ class TreeItemView extends HTMLElement {
     const children = this.treeItem.getChildren()
     let count = 0
     children.forEach((childItem, index) => {
-      if (childItem instanceof TreeItem && childItem.getSelectable()) {
+      if (childItem instanceof TreeItem && childItem.isSelectable()) {
         count++
       }
     })
@@ -231,7 +231,7 @@ class TreeItemView extends HTMLElement {
     if (!this.childrenAlreadyCreated) {
       const children = this.treeItem.getChildren()
       children.forEach((childItem, index) => {
-        if (childItem instanceof TreeItem && childItem.getSelectable()) {
+        if (childItem instanceof TreeItem && childItem.isSelectable()) {
           this.addChild(childItem, index)
         }
       })
