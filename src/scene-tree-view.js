@@ -147,11 +147,11 @@ class TreeItemView extends HTMLElement {
           visibleParam.setValue(!visibleParam.getValue())
         }
       })
-      this.treeItem.on('visibilityChanged', this.updateVisibility.bind(this))
+      this.updateVisibilityId = this.treeItem.on('visibilityChanged', this.updateVisibility.bind(this))
       this.updateVisibility()
 
       // Highlights
-      this.treeItem.on('highlightChanged', this.updateHighlight.bind(this))
+      this.updateHighlightId = this.treeItem.on('highlightChanged', this.updateHighlight.bind(this))
       this.updateHighlight()
 
       const numChildren = this.countChildren()
