@@ -286,6 +286,13 @@ class TreeItemView extends HTMLElement {
     return this.itemChildren.children[index]
   }
 
+  getChildByTreeItem(treeItem) {
+    for (let i = 0; i < this.itemChildren.children.length; i++) {
+      if (this.itemChildren.children[i].treeItem == treeItem) return this.itemChildren.children[i]
+    }
+    return null
+  }
+
   /**
    * The destroy method.
    */
@@ -445,6 +452,13 @@ class SceneTreeView extends HTMLElement {
     this.rootTreeItem = treeItem
     this.appData = appData
     this.treeItemView.setTreeItem(treeItem, appData)
+
+    if (this.appData && this.appData.selectionManager) {
+      this.appData.selectionManager.on('selectionChanged', (event) => {
+        const { selection } = event
+        this.expandSelection(selection, true)
+      })
+    }
   }
 
   __onMouseEnter(event) {
@@ -523,6 +537,8 @@ class SceneTreeView extends HTMLElement {
       // const selectedItems = selectionManager.getSelection()
       const newSelection = new Set()
       Array.from(selectedItems).forEach((item) => {
+        if (!item.getOwner()) return
+
         const index = item.getOwner().getChildIndex(item)
         if (index < item.getOwner().getNumChildren() - 1) newSelection.add(item.getOwner().getChild(index + 1))
         else {
@@ -554,10 +570,14 @@ class SceneTreeView extends HTMLElement {
       }
       let treeViewItem = this.treeItemView
       path.forEach((item, index) => {
-        if (index < path.length - 1) {
-          if (!treeViewItem.expanded) treeViewItem.expand()
-          const childIndex = item.getChildIndex(path[index + 1])
-          treeViewItem = treeViewItem.getChild(childIndex)
+        if (index < path.length - 1 && treeViewItem) {
+          if (treeViewItem.treeItem != item) {
+            console.log('Invalid tree view structure:', treeViewItem.treeItem.getName(), item.getName())
+          }
+          if (!treeViewItem.expanded) {
+            treeViewItem.expand()
+          }
+          treeViewItem = treeViewItem.getChildByTreeItem(path[index + 1])
         }
       })
       // causes the element to be always at the top of the view.

@@ -16,6 +16,7 @@ export default function init() {
     MeshProxy,
   } = zeaEngine
   const { CADAsset, CADBody } = zeaCad
+  const { SelectionManager } = zeaUx
 
   const urlParams = new URLSearchParams(window.location.search)
   const scene = new Scene()
@@ -35,6 +36,18 @@ export default function init() {
   envMap.load('./data/StudioG.zenv')
   scene.setEnvMap(envMap)
 
+  const appData = {
+    scene,
+    renderer,
+  }
+
+  // Setup FPS Display
+  const selectionManager = new SelectionManager(appData, {
+    selectionOutlineColor: new Color(1, 1, 0.2, 0.1),
+    branchSelectionOutlineColor: new Color(1, 1, 0.2, 0.1),
+  })
+  appData.selectionManager = selectionManager
+
   // Setup FPS Display
   const fpsElement = document.getElementById('fps')
   fpsElement.renderer = renderer
@@ -44,6 +57,7 @@ export default function init() {
   treeElement.setTreeItem(scene.getRoot(), {
     scene,
     renderer,
+    selectionManager,
   })
 
   // let highlightedItem
@@ -66,6 +80,29 @@ export default function init() {
           const globalXfo = item.getParameter('LocalXfo').getValue()
           console.log(item.getName(), globalXfo.sc.toString())
           item = item.getOwner()
+        }
+      }
+    }
+  })
+
+  renderer.getViewport().on('pointerUp', (event) => {
+    // Detect a right click
+    if (event.button == 0 && event.intersectionData) {
+      // // if the selection tool is active then do nothing, as it will
+      // // handle single click selection.s
+      // const toolStack = toolManager.toolStack
+      // if (toolStack[toolStack.length - 1] == selectionTool) return
+
+      // To provide a simple selection when the SelectionTool is not activated,
+      // we toggle selection on the item that is selcted.
+      const item = filterItem(event.intersectionData.geomItem)
+      if (item) {
+        if (!event.shiftKey) {
+          selectionManager.toggleItemSelection(item, !event.ctrlKey)
+        } else {
+          const items = new Set()
+          items.add(item)
+          selectionManager.deselectItems(items)
         }
       }
     }
