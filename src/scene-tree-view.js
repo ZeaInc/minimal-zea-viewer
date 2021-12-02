@@ -1,4 +1,4 @@
-const { Color, TreeItem } = window.zeaEngine
+const { Color, TreeItem, InstanceItem } = window.zeaEngine
 const { CADBody, PMIItem } = zeaCad
 
 const highlightColor = new Color('#F9CE03')
@@ -21,16 +21,6 @@ const setSelection = (treeItem, state, appData) => {
       selectedItem = null
     }
   }
-}
-
-const setSelectionSet = (set) => {
-  if (selectedItem) {
-    selectedItem.setSelected(false)
-    selectedItem.removeHighlight('selected', true)
-  }
-  selectedItem = treeItem
-  selectedItem.setSelected(true)
-  selectedItem.addHighlight('selected', highlightColor, true)
 }
 
 /**
@@ -83,8 +73,8 @@ class TreeItemView extends HTMLElement {
     }
 
     // Title element
-    this.titleElement = document.createElement('span')
-    this.titleElement.className = 'TreeNodesListItem__Title'
+    this.titleElement = document.createElement('div')
+    this.titleElement.className = 'TreeItemName'
     this.titleElement.addEventListener('click', (e) => {
       if (!this.appData || !this.appData.selectionManager) {
         if (!this.treeItem.isSelected()) {
@@ -103,6 +93,11 @@ class TreeItemView extends HTMLElement {
 
     this.itemHeader.appendChild(this.titleElement)
 
+    // Tooltip
+    this.tooltip = document.createElement('SPAN')
+    this.tooltip.className = 'tooltiptext'
+    this.itemHeader.appendChild(this.tooltip)
+
     //
     shadowRoot.appendChild(this.itemContainer)
   }
@@ -115,14 +110,36 @@ class TreeItemView extends HTMLElement {
   setTreeItem(treeItem, appData) {
     this.treeItem = treeItem
 
-    this.appData = appData
+    let name
+    const displayNameParam = this.treeItem.getParameter('DisplayName')
+    if (displayNameParam) {
+      name = displayNameParam.getValue()
+    } else name = this.treeItem.getName()
+
+    if (this.treeItem instanceof InstanceItem && this.treeItem.getNumChildren() == 1) {
+      const referenceItem = this.treeItem.getChild(0)
+      if (name == '') {
+        const displayNameParam = referenceItem.getParameter('DisplayName')
+        if (displayNameParam) {
+          name = displayNameParam.getValue()
+        } else name = referenceItem.getName()
+      }
+
+      this.titleElement.textContent = name
+
+      this.tooltip.textContent = `Instance of (${referenceItem.getClassName()})`
+    } else {
+      this.tooltip.textContent = `(${this.treeItem.getClassName()})`
+      this.titleElement.textContent = name
+    }
 
     // Name
-    this.titleElement.textContent = treeItem.getName()
     const updateName = () => {
       this.titleElement.textContent = treeItem.getName()
     }
     this.treeItem.on('nameChanged', updateName)
+
+    this.appData = appData
 
     // Selection
     this.updateSelectedId = this.treeItem.on('selectedChanged', this.updateSelected.bind(this))
@@ -147,11 +164,11 @@ class TreeItemView extends HTMLElement {
           visibleParam.setValue(!visibleParam.getValue())
         }
       })
-      this.updateVisibilityId = this.treeItem.on('visibilityChanged', this.updateVisibility.bind(this))
+      this.treeItem.on('visibilityChanged', this.updateVisibility.bind(this))
       this.updateVisibility()
 
       // Highlights
-      this.updateHighlightId = this.treeItem.on('highlightChanged', this.updateHighlight.bind(this))
+      this.treeItem.on('highlightChanged', this.updateHighlight.bind(this))
       this.updateHighlight()
 
       const numChildren = this.countChildren()
@@ -209,6 +226,10 @@ class TreeItemView extends HTMLElement {
     }
   }
 
+  /**
+   * Count the number of selectable children.
+   * @return {number} the number of selectable children.
+   */
   countChildren() {
     const children = this.treeItem.getChildren()
     let count = 0
@@ -229,7 +250,13 @@ class TreeItemView extends HTMLElement {
     this.expandBtn.innerHTML = '-'
 
     if (!this.childrenAlreadyCreated) {
-      const children = this.treeItem.getChildren()
+      let children
+      if (this.treeItem instanceof InstanceItem && this.treeItem.getNumChildren() == 1) {
+        children = this.treeItem.getChild(0).getChildren()
+      } else {
+        children = this.treeItem.getChildren()
+      }
+
       children.forEach((childItem, index) => {
         if (childItem instanceof TreeItem && childItem.isSelectable()) {
           this.addChild(childItem, index)
@@ -368,15 +395,18 @@ TreeItemView.css = `
     display: flex;
     margin: 0 auto;
     color: azure;
+    
+    position: relative;
   }
 
-  .TreeNodesListItem__Title {
+  .TreeItemName {
     cursor: default;
     padding: 2px 4px;
     border-radius: 5px;
+    
   }
 
-  .TreeNodesListItem__Hover {
+  .TreeNodesListItem:hover {
     background-color: #e1f5fe;
   }
 
@@ -384,20 +414,62 @@ TreeItemView.css = `
     background-color: #e1f5fe;
   }
 
-  .TreeNodesListItem--isSelected > .TreeNodeHeader > .TreeNodesListItem__Title {
+  .TreeNodesListItem--isSelected > .TreeNodeHeader > .TreeItemName {
     // background-color: #76d2bb;
     color: #3B3B3B;
   }
 
-  .TreeNodesListItem--isHidden > .TreeNodeHeader >  .TreeNodesListItem__Title {
+  .TreeNodesListItem--isHidden > .TreeNodeHeader >  .TreeItemName {
     color: #9e9e9e;
   }
 
-  .TreeNodesListItem--isHighlighted > .TreeNodeHeader >  .TreeNodesListItem__Title {
+  .TreeNodesListItem--isHighlighted > .TreeNodeHeader >  .TreeItemName {
     // border-style: solid;
     // border-width: thin;
   }
 
+/* Tooltip text */
+.TreeNodeHeader .tooltiptext {
+  display: flex;
+  visibility: hidden;
+  background-color: #aaa;
+  color: #fff;
+  text-align: center;
+  padding: 2px 4px;
+  border-radius: 6px;
+  width: 200px;
+  height: 22px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1000;
+  bottom: -125%;
+  left: 50%;
+  margin-top: -50px;
+  margin-left: -50px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.TreeNodeHeader .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 90%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.TreeNodeHeader:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
   `
 
 customElements.define('tree-item-view', TreeItemView)
