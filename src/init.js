@@ -239,10 +239,10 @@ const loadCADAsset = (zcad, filename, framecamera) => {
   //comment the following code if you want to load via URL params or the drop zone
   if (dropZone) dropZone.hide()
   //load default sample part
-  //loadCADAsset("./data/HC_SRO4.zcad", "HC_SRO4.zcad", true);
+  loadCADAsset("./data/HC_SRO4.zcad", "HC_SRO4.zcad", true);
 
   //load default sample part
-  loadCADAsset("./data/PressRink.zcad", "PressRink.zcad", true);
+  //loadCADAsset("./data/PressRink.zcad", "PressRink.zcad", true);
 
   //uncomment to load large automobile assembly
   // loadCADAsset("./data/01 dipan/01 dipan.zcad", "01 dipan.zcad", false);
