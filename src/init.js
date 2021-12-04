@@ -218,7 +218,7 @@ const loadCADAsset = (zcad, filename, framecamera) => {
   }
 
   if (urlParams.has('zcad')) {
-    loadCADfile(urlParams.get('zcad'))
+    loadCADAsset(urlParams.get('zcad'))
     const dropZone = document.getElementById('dropZone')
     if (dropZone) dropZone.hide()
   } else if (urlParams.has('gltf')) {
