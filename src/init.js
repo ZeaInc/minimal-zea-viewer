@@ -179,8 +179,8 @@ const loadCADAsset = (zcad, filename, framecamera) => {
     scene.getRoot().addChild(asset)
  
     const xfo = new Xfo();
-    // xfo.ori.setFromEulerAngles(new EulerAngles(90 * (Math.PI / 180), 0, 0));
-    xfo.ori.setFromEulerAngles(new EulerAngles(180 * (Math.PI / 180), 90 * (Math.PI / 180), 0 * (Math.PI / 180))); //for PressRink
+    xfo.ori.setFromEulerAngles(new EulerAngles(90 * (Math.PI / 180), 0, 0));
+    //xfo.ori.setFromEulerAngles(new EulerAngles(180 * (Math.PI / 180), 90 * (Math.PI / 180), 0 * (Math.PI / 180))); //for PressRink
     asset.getParameter("GlobalXfo").setValue(xfo);
  }
 
