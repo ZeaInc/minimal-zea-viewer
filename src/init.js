@@ -184,7 +184,9 @@ export default function init() {
     console.log('geomItems:' + geomItems + ' lines: ' + lines + ' triangles:', triangles)
   }
   const loadCADAsset = (zcad, filename) => {
-    const asset = new CADAsset(filename)
+    // Note: leave the asset name empty so that the asset
+    // gets the name of the product in the file.
+    const asset = new CADAsset()
 
     const context = new AssetLoadContext()
     // pass the camera in wth the AssetLoadContext so that
