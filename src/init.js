@@ -14,8 +14,9 @@ export default function init() {
     LinesProxy,
     Mesh,
     MeshProxy,
+    InstanceItem,
   } = zeaEngine
-  const { CADAsset, CADBody } = zeaCad
+  const { CADAsset, CADBody, PMIItem } = zeaCad
   const { SelectionManager } = zeaUx
 
   const urlParams = new URLSearchParams(window.location.search)
@@ -64,7 +65,12 @@ export default function init() {
   const highlightColor = new Color('#F9CE03')
   highlightColor.a = 0.1
   const filterItem = (item) => {
-    while (item && !(item instanceof CADBody)) item = item.getOwner()
+    while (item && !(item instanceof CADBody) && !(item instanceof PMIItem)) {
+      item = item.getOwner()
+    }
+    if (item.getOwner() instanceof InstanceItem) {
+      item = item.getOwner()
+    }
     return item
   }
   renderer.getViewport().on('pointerDown', (event) => {
@@ -73,11 +79,11 @@ export default function init() {
       if (geomItem) {
         console.log(geomItem.getPath())
 
-        const geom = event.intersectionData.geomItem.getParameter('Geometry').getValue()
+        const geom = event.intersectionData.geomItem.geomParam.value
         console.log(geom.getNumVertices(), event.intersectionData.geomItem.geomIndex)
         let item = event.intersectionData.geomItem
         while (item) {
-          const globalXfo = item.getParameter('LocalXfo').getValue()
+          const globalXfo = item.localXfoParam.value
           console.log(item.getName(), globalXfo.sc.toString())
           item = item.getOwner()
         }
@@ -163,7 +169,7 @@ export default function init() {
     scene.getRoot().traverse((item) => {
       geomItems++
       if (item instanceof GeomItem) {
-        const geom = item.getParameter('Geometry').getValue()
+        const geom = item.geomParam.value
         if (geom instanceof Lines) {
           lines += geom.getNumSegments()
         } else if (geom instanceof LinesProxy) {
@@ -185,6 +191,34 @@ export default function init() {
     // PMI classes can bind to it.
     context.camera = renderer.getViewport().getCamera()
     asset.load(zcad, context).then(() => {
+      const materials = asset.getMaterialLibrary().getMaterials()
+      materials.forEach((material) => {
+        // Convert linear space values to gamma space values.
+        // The shaders assume gamma space values, to convert to linear at render time.
+        const baseColorParam = material.getParameter('BaseColor')
+        if (baseColorParam) {
+          const baseColor = baseColorParam.value.toGamma()
+          baseColorParam.setValue(baseColor)
+        }
+      })
+
+      // The following is a quick hack to remove the black outlines around PMI text.
+      // We do not crete ourlines around transparent geometries, so by forcing
+      // the PMI items sub-trees to be considered transparent, it moves them into
+      // the GLTransparentPass, which does not draw outlines. this cleans up
+      // the rendering considerably.
+      asset.traverse((item) => {
+        if (item instanceof PMIItem) {
+          item.traverse((item) => {
+            if (item instanceof GeomItem) {
+              item.materialParam.value.__isTransparent = true
+            }
+          })
+          return false
+        }
+        return true
+      })
+
       renderer.frameAll()
     })
     asset.getGeometryLibrary().on('loaded', () => {
