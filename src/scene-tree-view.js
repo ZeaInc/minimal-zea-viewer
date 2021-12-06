@@ -1,6 +1,56 @@
 const { Color, TreeItem, InstanceItem } = window.zeaEngine
 const { CADBody, PMIItem } = zeaCad
 
+// ////////////////////////////////////////
+// Provide a simple debug mode to enable debugging the tree view.
+let displayTreeComplexity = false
+const colorStart = new Color(0, 0, 0)
+const colorEnd = new Color(1, 0, 0)
+const treeItemWeights = {}
+let rootTreeItemView
+let totalWeight = 0
+let recalcRequested = 0
+const updateTreeView = () => {
+  if (recalcRequested == 0) {
+    recalcRequested = setTimeout(() => {
+      rootTreeItemView.displayTreeWeight()
+      recalcRequested = 0
+    }, 100)
+  }
+}
+const propagateWeightUp = (treeItem, delta) => {
+  treeItemWeights[treeItem.getId()] += delta
+  if (treeItem.getOwner()) propagateWeightUp(treeItem.getOwner(), delta)
+}
+const calcTreeWeight = (treeItem) => {
+  let weight = 1 // self
+  const children = treeItem.getChildren()
+  children.forEach((childItem, index) => {
+    weight += calcTreeWeight(childItem)
+  })
+  treeItemWeights[treeItem.getId()] = weight
+
+  treeItem.on('childAdded', (event) => {
+    const { childItem } = event
+    const childWeight = calcTreeWeight(childItem)
+    totalWeight += childWeight
+    propagateWeightUp(treeItem, childWeight)
+
+    updateTreeView()
+  })
+  treeItem.on('childRemoved', (event) => {
+    const { childItem } = event
+    const childWeight = -calcTreeWeight(childItem)
+    totalWeight += childWeight
+    propagateWeightUp(treeItem, childWeight)
+
+    updateTreeView()
+  })
+  return weight
+}
+
+// ////////////////////////////////////////
+
 const highlightColor = new Color('#F9CE03')
 highlightColor.a = 0.1
 
@@ -179,6 +229,10 @@ class TreeItemView extends HTMLElement {
       this.childAddedId = this.treeItem.on('childAdded', this.childAdded.bind(this))
       this.childRemovedId = this.treeItem.on('childRemoved', this.childRemoved.bind(this))
     }
+
+    if (displayTreeComplexity) {
+      this.displayTreeWeight()
+    }
   }
 
   /**
@@ -224,6 +278,26 @@ class TreeItemView extends HTMLElement {
       this.titleElement.style.removeProperty('border-color')
       this.titleElement.style.removeProperty('background-color')
     }
+  }
+
+  /**
+   * Display the weight of this tree item against the weight of the entire tree.
+   */
+  displayTreeWeight() {
+    const weight = treeItemWeights[this.treeItem.getId()]
+
+    // Note: use a power curve so that the colors don't go black too fast.
+    const weightFract = Math.pow(weight / totalWeight, 0.25)
+    // console.log(weight, totalWeight, weightFract)
+    const bgColor = colorStart.lerp(colorEnd, weightFract)
+    this.titleElement.style.setProperty('background-color', bgColor.toHex())
+    this.tooltip.textContent = `(${weight}/${totalWeight})`
+
+    const children = this.treeItem.getChildren()
+    children.forEach((childItem, index) => {
+      const childTreeItemView = this.getChildByTreeItem(childItem)
+      if (childTreeItemView) childTreeItemView.displayTreeWeight()
+    })
   }
 
   /**
@@ -523,6 +597,13 @@ class SceneTreeView extends HTMLElement {
   setTreeItem(treeItem, appData) {
     this.rootTreeItem = treeItem
     this.appData = appData
+
+    // calculate the weight of the entire tree before displaying.
+    if (displayTreeComplexity) {
+      rootTreeItemView = this.treeItemView
+      totalWeight = calcTreeWeight(this.rootTreeItem)
+    }
+
     this.treeItemView.setTreeItem(treeItem, appData)
 
     if (this.appData && this.appData.selectionManager) {
@@ -531,6 +612,10 @@ class SceneTreeView extends HTMLElement {
         this.expandSelection(selection, true)
       })
     }
+  }
+
+  setDebugTreeComplexityMode() {
+    displayTreeComplexity = true
   }
 
   __onMouseEnter(event) {
