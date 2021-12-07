@@ -76,23 +76,16 @@ main {
   min-height: 10px;
   display: flex;
 }
-#schedule-view {
-  width: 100%;
-  height: 100%;
-}
 
-.progress-display {
+#progress {
   position: absolute;
   left: 0px;
   bottom: 0px;
   width: 100%;
-  height: 5px;
+  height: 10px;
 }
-progress::-webkit-progress-value {
+#progress::-webkit-progress-value {
   background: #f9ce03;
-}
-progress {
-  color: #f9ce03;
 }
 
 .fps-display {

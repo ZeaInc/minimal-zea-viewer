@@ -42,12 +42,16 @@ export default function init() {
     renderer,
   }
 
-  // Setup FPS Display
+  // Setup Selection Manager
   const selectionManager = new SelectionManager(appData, {
     selectionOutlineColor: new Color(1, 1, 0.2, 0.1),
     branchSelectionOutlineColor: new Color(1, 1, 0.2, 0.1),
   })
   appData.selectionManager = selectionManager
+
+  // Setup Progress Bar
+  const progressElement = document.getElementById('progress')
+  progressElement.resourceLoader = resourceLoader
 
   // Setup FPS Display
   const fpsElement = document.getElementById('fps')
@@ -111,14 +115,6 @@ export default function init() {
           selectionManager.deselectItems(items)
         }
       }
-    }
-  })
-
-  resourceLoader.on('progressIncremented', (event) => {
-    const pct = document.getElementById('progress')
-    pct.value = event.percent
-    if (event.percent >= 100) {
-      setTimeout(() => pct.classList.add('hidden'), 1000)
     }
   })
 

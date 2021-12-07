@@ -21,6 +21,7 @@
     <script src="https://www.gstatic.com/draco/v1/decoders/draco_decoder_gltf.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/gltf-loader@4.0.4-next.0/dist/index.umd.js"></script>
 
+    <script src="./src/zea-progress-bar.js" type="module"></script>
     <script src="./src/zea-fps-display.js" type="module"></script>
     <script src="./src/scene-tree-view.js" type="module"></script>
     <script src="./src/drop-zone.js" type="module"></script>
@@ -48,9 +49,7 @@
               </div>
               <div class="xr-button hidden" id="xr-button"></div>
               <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
-              <progress class="progress-display" id="progress" value="0" max="100">
-                0%
-              </progress>
+              <zea-progress-bar id="progress"></zea-progress-bar>
             </div>
           </div>
         </div>
