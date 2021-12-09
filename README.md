@@ -1,6 +1,6 @@
 # minimal-zea-viewer
 
-This is a minomal sample application built using vanilla JavaScript, HTML, and
+This is a minimal sample application built using vanilla JavaScript, HTML, and
 WebComponents. It is a simple, framework agnostic sample that shows how to load
 and render various file formats, while providing a simple tree view to explore
 the model structure.
