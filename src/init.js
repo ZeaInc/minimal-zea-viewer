@@ -62,7 +62,7 @@ export default function init() {
     scene,
     renderer,
     selectionManager,
-    displayTreeComplexity: true
+    displayTreeComplexity: false,
   })
 
   // let highlightedItem
