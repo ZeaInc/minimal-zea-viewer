@@ -15,8 +15,10 @@ export default function init() {
     Mesh,
     MeshProxy,
     InstanceItem,
+    CADAsset,
+    CADBody,
+    PMIItem,
   } = zeaEngine
-  const { CADAsset, CADBody, PMIItem } = zeaCad
   const { SelectionManager } = zeaUx
 
   const urlParams = new URLSearchParams(window.location.search)
@@ -43,9 +45,11 @@ export default function init() {
   }
 
   // Setup Selection Manager
+  const selectionColor = new Color('#F9CE03')
+  selectionColor.a = 0.1
   const selectionManager = new SelectionManager(appData, {
-    selectionOutlineColor: new Color(1, 1, 0.2, 0.1),
-    branchSelectionOutlineColor: new Color(1, 1, 0.2, 0.1),
+    selectionOutlineColor: selectionColor,
+    branchSelectionOutlineColor: selectionColor,
   })
   appData.selectionManager = selectionManager
 
@@ -59,11 +63,8 @@ export default function init() {
 
   // Setup TreeView Display
   const treeElement = document.getElementById('tree')
-  treeElement.setTreeItem(scene.getRoot(), {
-    scene,
-    renderer,
-    selectionManager,
-  })
+  treeElement.setTreeItem(scene.getRoot())
+  treeElement.setSelectionManager(selectionManager)
 
   // let highlightedItem
   const highlightColor = new Color('#F9CE03')
@@ -189,17 +190,6 @@ export default function init() {
     // PMI classes can bind to it.
     context.camera = renderer.getViewport().getCamera()
     asset.load(zcad, context).then(() => {
-      const materials = asset.getMaterialLibrary().getMaterials()
-      materials.forEach((material) => {
-        // Convert linear space values to gamma space values.
-        // The shaders assume gamma space values, to convert to linear at render time.
-        const baseColorParam = material.getParameter('BaseColor')
-        if (baseColorParam) {
-          const baseColor = baseColorParam.value.toGamma()
-          baseColorParam.setValue(baseColor)
-        }
-      })
-
       // The following is a quick hack to remove the black outlines around PMI text.
       // We do not crete ourlines around transparent geometries, so by forcing
       // the PMI items sub-trees to be considered transparent, it moves them into
@@ -260,16 +250,10 @@ export default function init() {
 
   if (urlParams.has('zcad')) {
     loadCADAsset(urlParams.get('zcad'))
-    const dropZone = document.getElementById('dropZone')
-    if (dropZone) dropZone.hide()
   } else if (urlParams.has('gltf')) {
     loadGLTFAsset(urlParams.get('gltf'))
-    const dropZone = document.getElementById('dropZone')
-    if (dropZone) dropZone.hide()
   } else if (urlParams.has('obj')) {
     loadOBJAsset(urlParams.get('obj'))
-    const dropZone = document.getElementById('dropZone')
-    if (dropZone) dropZone.hide()
   } else {
     const dropZone = document.getElementById('dropZone')
     dropZone.display((url, filename) => {
