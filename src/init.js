@@ -52,7 +52,6 @@ export default function init() {
     branchSelectionOutlineColor: selectionColor,
   })
   appData.selectionManager = selectionManager
-
   // Setup Progress Bar
   const progressElement = document.getElementById('progress')
   progressElement.resourceLoader = resourceLoader
@@ -63,8 +62,12 @@ export default function init() {
 
   // Setup TreeView Display
   const treeElement = document.getElementById('tree')
-  treeElement.setTreeItem(scene.getRoot())
-  treeElement.setSelectionManager(selectionManager)
+  treeElement.setTreeItem(scene.getRoot(), {
+    scene,
+    renderer,
+    selectionManager,
+    displayTreeComplexity: false,
+  })
 
   // let highlightedItem
   const highlightColor = new Color('#F9CE03')
