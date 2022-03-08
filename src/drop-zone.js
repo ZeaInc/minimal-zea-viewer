@@ -116,6 +116,8 @@ class DropZone extends HTMLElement {
 `)
     )
     shadowRoot.appendChild(styleTag)
+
+    this.hide()
   }
 
   display(loadFileCallback) {

@@ -13,14 +13,15 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css"
     />
     <link rel="stylesheet" href="./src/styles.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@3.12.4/dist/index.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@3.4.2/dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@v4.2.0-b20e969/dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-ux@4.0.5/dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-tree-view@0.0.8/dist/zeatreeview.umd.development.js"></script>
 
     <script src="https://www.gstatic.com/draco/v1/decoders/draco_decoder_gltf.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/gltf-loader@3.2.6/dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/gltf-loader@4.0.4-next.0/dist/index.umd.js"></script>
 
+    <script src="./src/zea-progress-bar.js" type="module"></script>
     <script src="./src/zea-fps-display.js" type="module"></script>
-    <script src="./src/scene-tree-view.js" type="module"></script>
     <script src="./src/drop-zone.js" type="module"></script>
     <script src="./src/login-dialog.js" type="module"></script>
   </head>
@@ -34,10 +35,10 @@
         <div class="flex-1" id="topPanel">
           <div class="splitter">
             <div id="leftPanel">
-              <scene-tree-view
+              <zea-tree-view
                 id="tree"
                 class="select-none"
-              ></scene-tree-view>
+              ></zea-tree-view>
             </div>
             <div class="separator" id="separatorV"></div>
             <div id="mainPanel" class="flex-1">
@@ -46,9 +47,7 @@
               </div>
               <div class="xr-button hidden" id="xr-button"></div>
               <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
-              <progress class="progress-display" id="progress" value="0" max="100">
-                0%
-              </progress>
+              <zea-progress-bar id="progress"></zea-progress-bar>
             </div>
           </div>
         </div>
