@@ -10,7 +10,20 @@ This is a minomal sample application built using vanilla JavaScript, HTML, and W
 
 # Running the demo
 
-simply run an http-server in the same folder as the sample and load the index.html
+For example, run in your terminal:
+
+```bash
+npx http-server
+```
+
+Then go to:
+
+[http://localhost:8080/?zcad=data%2FHC_SRO4.zcad](http://localhost:8080/?zcad=data%2FHC_SRO4.zcad)
+
+or: 
+[http://localhost:8080/index.html?zcad=data%2FPinki%2FFull_na_stalcima.zcad](http://localhost:8080/index.html?zcad=data%2FPinki%2FFull_na_stalcima.zcad)
+
+## Loading data
 
 You can load data by drag and drop, or using a pick file dialog.
 
