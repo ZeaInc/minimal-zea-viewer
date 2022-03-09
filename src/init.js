@@ -242,7 +242,7 @@ const loadCADAsset = (zcad, filename, framecamera) => {
   //loadCADAsset("./data/HC_SRO4.zcad", "HC_SRO4.zcad", true);
 
   //load default sample part
-  loadCADAsset("./data/pinki/Full_na_stalcima.zcad", "Full_na_stalcima.zcad", true);
+  loadCADAsset("./data/Pinki/Full_na_stalcima.zcad", "Full_na_stalcima.zcad", true);
 
   //uncomment to load large automobile assembly
   // loadCADAsset("./data/01 dipan/01 dipan.zcad", "01 dipan.zcad", false);
