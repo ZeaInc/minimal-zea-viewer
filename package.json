@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "http-server": "^14.1.0",
+    "prettier": "^2.6.0"
+  },
+  "scripts": {
+    "start": "http-server"
+  }
+}

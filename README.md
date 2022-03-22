@@ -7,16 +7,19 @@ the model structure.
 
 ## Running the demo
 
-Simply run an HTTP server in the same folder as the sample and load the index.html
-file.
-
-For example, run in your terminal:
+1. Install dependencies:
 
 ```bash
-npx http-server
+npm install
 ```
 
-Then go to:
+2. Run `start` script:
+
+```bash
+npm run start
+```
+
+3. Go to:
 
 [http://localhost:8080/?zcad=data%2FHC_SRO4.zcad](http://localhost:8080/?zcad=data%2FHC_SRO4.zcad)
 
