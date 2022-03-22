@@ -61,8 +61,9 @@ export default function init() {
   fpsElement.renderer = renderer
 
   // Setup TreeView Display
-  const treeElement = document.getElementById('tree')
-  treeElement.setTreeItem(scene.getRoot(), {
+  const $tree = document.querySelector('#tree')
+  $tree.setSelectionManager(selectionManager)
+  $tree.setTreeItem(scene.getRoot(), {
     scene,
     renderer,
     selectionManager,

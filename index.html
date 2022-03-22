@@ -2,24 +2,18 @@
 <html class="h-full">
   <head>
     <title>Zea CAD Viewer</title>
-    <link
-      rel="shortcut icon"
-      type="image/png"
-      href="./data/favicon-32x32.png"
-    />
+    <link rel="shortcut icon" type="image/png" href="./data/favicon-32x32.png" />
     <meta charset="UTF-8" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css"
-    />
-    <link rel="stylesheet" href="./src/styles.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@v4.2.0-b20e969/dist/index.umd.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
+    <link rel="stylesheet" href="./src/styles.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@4.3.0/dist/index.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-ux@4.0.5/dist/index.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-tree-view@0.0.8/dist/zeatreeview.umd.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-tree-view@0.1.3-next.2/dist/index.umd.development.js"></script>
 
     <script src="https://www.gstatic.com/draco/v1/decoders/draco_decoder_gltf.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/gltf-loader@4.0.4-next.0/dist/index.umd.js"></script>
-    
+
     <script src="./src/zea-progress-bar.js" type="module"></script>
     <script src="./src/zea-fps-display.js" type="module"></script>
     <script src="./src/drop-zone.js" type="module"></script>
@@ -29,21 +23,18 @@
   <body class="overflow-hidden h-full">
     <div class="h-full flex flex-col">
       <header class="p-2">
-        <img src="./data/logo-zea.svg" id="logo"></img>
+        <img src="./data/logo-zea.svg" id="logo" />
       </header>
       <main class="flex flex-col flex-1">
         <div class="flex-1" id="topPanel">
           <div class="splitter">
             <div id="leftPanel">
-              <zea-tree-view
-                id="tree"
-                class="select-none"
-              ></zea-tree-view>
+              <zea-tree-view id="tree" class="select-none"></zea-tree-view>
             </div>
             <div class="separator" id="separatorV"></div>
             <div id="mainPanel" class="flex-1">
               <div id="canvas-holder">
-                <canvas id="canvas" > </canvas>
+                <canvas id="canvas"></canvas>
               </div>
               <div class="xr-button hidden" id="xr-button"></div>
               <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
@@ -61,16 +52,16 @@
     </div>
     <script type="module">
       import dragElement from './src/panels.js'
-      const separatorV = document.getElementById("separatorV");
-      const leftPanel = document.getElementById("leftPanel");
-      const mainPanel = document.getElementById("mainPanel");
-      dragElement(separatorV, leftPanel, mainPanel, "H");
+      const separatorV = document.getElementById('separatorV')
+      const leftPanel = document.getElementById('leftPanel')
+      const mainPanel = document.getElementById('mainPanel')
+      dragElement(separatorV, leftPanel, mainPanel, 'H')
 
-      const separatorH = document.getElementById("separatorH");
-      const topPanel = document.getElementById("topPanel");
-      const bottomPanel = document.getElementById("bottomPanel");
+      const separatorH = document.getElementById('separatorH')
+      const topPanel = document.getElementById('topPanel')
+      const bottomPanel = document.getElementById('bottomPanel')
       if (separatorH && topPanel && bottomPanel) {
-        dragElement(separatorH, topPanel, bottomPanel, "V");
+        dragElement(separatorH, topPanel, bottomPanel, 'V')
       }
     </script>
 
@@ -81,8 +72,8 @@
       // change this value to true.
       if (false) {
         // Show the login page.
-        const login = document.getElementById("login");
-        login.show(()=> {
+        const login = document.getElementById('login')
+        login.show(() => {
           // When it is closed, init the scene.
           init()
         })
