@@ -23,6 +23,9 @@ npm run start
 
 [http://localhost:8080/?zcad=data%2FHC_SRO4.zcad](http://localhost:8080/?zcad=data%2FHC_SRO4.zcad)
 
+(Your port might be different.
+Check the actual port in the output of the previous command.)
+
 ## Loading data
 
 You can load data by drag and drop, or using a pick file dialog.
