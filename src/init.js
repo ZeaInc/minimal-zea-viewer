@@ -19,6 +19,10 @@ export default function init() {
     CADAsset,
     CADBody,
     PMIItem,
+    CameraManipulator,
+
+    Sphere, 
+    StandardSurfaceMaterial
   } = zeaEngine
   const { SelectionManager } = zeaUx
 
@@ -35,10 +39,19 @@ export default function init() {
   // renderer.solidAngleLimit = 0.0;
   renderer.setScene(scene)
   renderer.getViewport().getCamera().setPositionAndTarget(new Vec3(2, 2, 2), new Vec3(0, 0, 0.5))
+  renderer.getViewport().backgroundColorParam.value = new Color('#eeeeee')
+
+  
+  const cameraManipulator = renderer.getViewport().getManipulator()
+  cameraManipulator.setDefaultManipulationMode('turntable')
+  // cameraManipulator.setDefaultManipulationMode('tumbler')
 
   const envMap = new EnvMap()
   envMap.load('./data/StudioG.zenv')
   scene.setEnvMap(envMap)
+
+  // ///////////////////////////////////////
+  // Setup the Selection Manager
 
   const appData = {
     scene,
@@ -74,14 +87,16 @@ export default function init() {
   // let highlightedItem
   const highlightColor = new Color('#F9CE03')
   highlightColor.a = 0.1
-  const filterItem = (item) => {
+  const filterItem = (srcItem) => {
+    let item = srcItem
     while (item && !(item instanceof CADBody) && !(item instanceof PMIItem)) {
       item = item.getOwner()
     }
-    if (item.getOwner() instanceof InstanceItem) {
+    if (item && item.getOwner() instanceof InstanceItem) {
       item = item.getOwner()
     }
-    return item
+    if (item) return item
+    else return srcItem
   }
   renderer.getViewport().on('pointerDown', (event) => {
     if (event.intersectionData) {
@@ -131,6 +146,15 @@ export default function init() {
     }
   })
 
+  document.addEventListener('contextmenu', (event) => {
+    // prevent context menu from being displayed when right clicking on the viewport.
+    // Note: we allow context menus for other items.
+    event.preventDefault()
+    event.stopPropagation()
+  })
+
+  // ////////////////////////////////////////////
+  // Enable WebXR
   renderer.getXRViewport().then((xrvp) => {
     fpsElement.style.bottom = '70px'
 
@@ -158,12 +182,16 @@ export default function init() {
     })
   })
 
+
   if (urlParams.has('profile')) {
     renderer.startContinuousDrawing()
   }
+  // ////////////////////////////////////////////
+  // Build the scene
 
   // ////////////////////////////////////////////
   // Load the asset
+  /* */
   const calcSceneComplexity = () => {
     let geomItems = 0
     let triangles = 0
@@ -271,6 +299,7 @@ export default function init() {
       loadAsset(url, filename)
     })
   }
+  /* */
 
   // const xfo = new Xfo();
   // xfo.ori.setFromEulerAngles(new EulerAngles(90 * (Math.PI / 180), 0, 0));
