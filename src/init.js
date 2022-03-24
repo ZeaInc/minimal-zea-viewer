@@ -3,6 +3,7 @@ export default function init() {
   const {
     Color,
     Vec3,
+    Xfo,
     Scene,
     GLRenderer,
     EnvMap,
@@ -33,7 +34,7 @@ export default function init() {
 
   // renderer.solidAngleLimit = 0.0;
   renderer.setScene(scene)
-  renderer.getViewport().getCamera().setPositionAndTarget(new Vec3(12, 12, 10), new Vec3(0, 0, 1.5))
+  renderer.getViewport().getCamera().setPositionAndTarget(new Vec3(2, 2, 2), new Vec3(0, 0, 0.5))
 
   const envMap = new EnvMap()
   envMap.load('./data/StudioG.zenv')
@@ -194,6 +195,7 @@ export default function init() {
     // PMI classes can bind to it.
     context.camera = renderer.getViewport().getCamera()
     asset.load(zcad, context).then(() => {
+      renderer.frameAll()
       // The following is a quick hack to remove the black outlines around PMI text.
       // We do not crete ourlines around transparent geometries, so by forcing
       // the PMI items sub-trees to be considered transparent, it moves them into
@@ -216,6 +218,11 @@ export default function init() {
     asset.getGeometryLibrary().on('loaded', () => {
       calcSceneComplexity()
     })
+    if (urlParams.has('ytoz')) {
+      const xfo = new Xfo()
+      xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
+      asset.globalXfoParam.value = xfo
+    }
     scene.getRoot().addChild(asset)
   }
 
