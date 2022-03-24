@@ -51,7 +51,7 @@ main {
   overflow: auto;
   width: 250px;
   min-width: 10px;
-  height: 100%;
+  height: calc(100vh - 40px);
 }
 
 #mainPanel {
