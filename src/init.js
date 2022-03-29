@@ -19,6 +19,7 @@ export default function init() {
     CADAsset,
     CADBody,
     PMIItem,
+    CompoundGeom
   } = zeaEngine
   const { SelectionManager } = zeaUx
 
@@ -180,6 +181,9 @@ export default function init() {
           triangles += geom.computeNumTriangles()
         } else if (geom instanceof MeshProxy) {
           triangles += geom.__buffers.indices ? geom.getNumTriangles() : geom.__buffers.numVertices / 3
+        } else if (geom instanceof CompoundGeom) {
+          lines += geom.getNumLineSegments()
+          triangles += geom.getNumTriangles()
         }
       }
     })
