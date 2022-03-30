@@ -29,6 +29,8 @@ import { ZeaTreeView } from '@zeainc/zea-tree-view'
 import { GLTFAsset } from '@zeainc/gltf-loader'
 import { DropZone } from './drop-zone'
 import { LoginDialog } from './login-dialog'
+import './drop-zone'
+import './login-dialog'
 
 interface AppData {
   scene?: Scene
