@@ -1,5 +1,6 @@
+//@ts-ignore
 import { auth, shouldAuthenticate, shouldProvideRoomID } from './auth.js'
-const { Color } = window.zeaEngine
+import { Color } from '@zeainc/zea-engine'
 
 export const getRandomString = (charCount = 3) =>
   Math.random()
@@ -11,13 +12,16 @@ const getRandomRoomId = () => {
   return `${getRandomString(3)}-${getRandomString(3)}-${getRandomString(3)}`
 }
 
-const setURLParam = (key, value) => {
+const setURLParam = (key: string, value: string) => {
   var url = new URL(window.location.href)
   url.searchParams.set(key, value)
-  window.history.pushState({}, null, url.href)
+  window.history.pushState({}, '', url.href)
 }
 
 class LoginDialog extends HTMLElement {
+  modal: HTMLDivElement
+  content: HTMLDivElement
+  onCloseCallback?: () => void
   constructor() {
     super()
     const shadowRoot = this.attachShadow({ mode: 'open' })
@@ -26,11 +30,11 @@ class LoginDialog extends HTMLElement {
     this.modal.classList.add('modal')
     shadowRoot.appendChild(this.modal)
 
-    this.modalContent = document.createElement('div')
-    this.modalContent.classList.add('modal-content')
-    this.modal.appendChild(this.modalContent)
+    this.content = document.createElement('div')
+    this.content.classList.add('modal-content')
+    this.modal.appendChild(this.content)
 
-    this.modalContent.innerHTML = `
+    this.content.innerHTML = `
         <div class="imgcontainer">
           <img src="./data/logo-zea.svg" alt="Avatar" class="avatar">
         </div>
@@ -57,25 +61,25 @@ class LoginDialog extends HTMLElement {
           <button type="submit" id="login">Login</button>
         </div>`
 
-    const uname = this.shadowRoot.getElementById('uname')
-    let psw
+    const uname = <HTMLInputElement>this.shadowRoot!.getElementById('uname')
+    let psw: HTMLInputElement
     if (shouldAuthenticate) {
-      psw = this.shadowRoot.getElementById('psw')
+      psw = <HTMLInputElement>this.shadowRoot!.getElementById('psw')
       psw.addEventListener('input', () => {
         psw.style.border = ''
       })
     }
 
-    let room
+    let room: HTMLInputElement
     if (shouldProvideRoomID) {
-      room = this.shadowRoot.getElementById('room')
+      room = <HTMLInputElement>this.shadowRoot!.getElementById('room')
       const urlParams = new URLSearchParams(window.location.search)
-      let roomId = urlParams.has('roomId') ? urlParams.get('roomId') : getRandomRoomId()
+      const roomId = urlParams.get('roomId') || getRandomRoomId()
       room.value = roomId
     }
 
-    let userData
-    auth.getUserData().then((result) => {
+    let userData: any
+    auth.getUserData().then((result: any) => {
       userData = result ? result : {}
       if (result) {
         psw.value = result.password
@@ -84,12 +88,12 @@ class LoginDialog extends HTMLElement {
     })
 
     // When the user clicks on <span> (x), close the modal
-    const loginBtn = this.shadowRoot.getElementById('login')
+    const loginBtn = <HTMLButtonElement>this.shadowRoot!.getElementById('login')
     loginBtn.onclick = async () => {
       const userId = getRandomString()
       userData.color = Color.random().toHex()
       userData.firstName = uname.value
-      userData.id = userId.value
+      userData.id = userId
       userData.lastName = ''
       userData.password = shouldAuthenticate ? psw.value : ''
       userData.username = uname.value
@@ -220,7 +224,7 @@ span.psw {
     shadowRoot.appendChild(styleTag)
   }
 
-  show(onCloseCallback) {
+  show(onCloseCallback: () => void) {
     this.onCloseCallback = onCloseCallback
 
     // Under a few conditions we don't need to display the dialog.
@@ -228,11 +232,11 @@ span.psw {
     // 2. a room id is not required, and cached authentication passes.
     const urlParams = new URLSearchParams(window.location.search)
     if (shouldAuthenticate && !shouldProvideRoomID) {
-      auth.isAuthenticated().then((result) => {
+      auth.isAuthenticated().then((result: any) => {
         if (result) this.close()
       })
     } else if (shouldProvideRoomID && urlParams.has('roomId')) {
-      auth.isAuthenticated().then((result) => {
+      auth.isAuthenticated().then((result: any) => {
         if (result) this.close()
       })
     }
@@ -242,8 +246,10 @@ span.psw {
 
   close() {
     this.modal.style.display = 'none'
-    this.onCloseCallback()
+    if (this.onCloseCallback) this.onCloseCallback()
   }
 }
 
 customElements.define('login-dialog', LoginDialog)
+
+export { LoginDialog }

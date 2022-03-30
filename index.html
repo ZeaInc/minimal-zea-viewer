@@ -7,24 +7,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
     <link rel="stylesheet" href="./src/styles.css" />
 
-    <!-- <script src="http://localhost:8000/dist/index.umd.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@4.3.0-99455a1/dist/index.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-ux@4.0.5/dist/index.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-tree-view@0.1.2/dist/index.umd.development.js"></script>
 
     <script src="https://www.gstatic.com/draco/v1/decoders/draco_decoder_gltf.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/gltf-loader@4.0.5/dist/index.umd.js"></script>
-
-    <script src="./src/zea-progress-bar.js" type="module"></script>
-    <script src="./src/zea-fps-display.js" type="module"></script>
-    <script src="./src/drop-zone.js" type="module"></script>
-    <script src="./src/login-dialog.js" type="module"></script>
+    <!-- 
+    <script src="/src/zea-progress-bar.js" type="module"></script>
+    <script src="/src/zea-fps-display.js" type="module"></script> -->
+    <script src="/src/drop-zone.ts" type="module"></script>
+    <script src="/src/login-dialog.ts" type="module"></script>
   </head>
 
   <body class="overflow-hidden h-full">
     <div class="h-full flex flex-col">
       <header class="p-2">
-        <img src="./data/logo-zea.svg" id="logo" />
+        <img src="/data/logo-zea.svg" id="logo" />
       </header>
       <main class="flex flex-col flex-1">
         <div class="flex-1" id="topPanel">
@@ -38,8 +37,8 @@
                 <canvas id="canvas"></canvas>
               </div>
               <div class="xr-button hidden" id="xr-button"></div>
-              <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
-              <zea-progress-bar id="progress"></zea-progress-bar>
+              <div class="fps-display" id="fps"></div>
+              <progress id="progress" max="100" value="100"></progress>
             </div>
           </div>
         </div>
@@ -52,7 +51,7 @@
       <login-dialog id="login" class="select-none"></login-dialog>
     </div>
     <script type="module">
-      import dragElement from './src/panels.js'
+      import dragElement from './src/panels.ts'
       const separatorV = document.getElementById('separatorV')
       const leftPanel = document.getElementById('leftPanel')
       const mainPanel = document.getElementById('mainPanel')
@@ -66,21 +65,6 @@
       }
     </script>
 
-    <script type="module">
-      import init from './src/init.js'
-
-      // To enable simple authentication in this app
-      // change this value to true.
-      if (false) {
-        // Show the login page.
-        const login = document.getElementById('login')
-        login.show(() => {
-          // When it is closed, init the scene.
-          init()
-        })
-      } else {
-        init()
-      }
-    </script>
+    <script type="module" src="./src/main.ts"></script>
   </body>
 </html>
