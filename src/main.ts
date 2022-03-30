@@ -1,36 +1,47 @@
+import {
+  Color,
+  Vec3,
+  Xfo,
+  Scene,
+  GLRenderer,
+  EnvMap,
+  resourceLoader,
+  AssetLoadContext,
+  GeomItem,
+  ObjAsset,
+  Lines,
+  LinesProxy,
+  Mesh,
+  MeshProxy,
+  InstanceItem,
+  CADAsset,
+  CADBody,
+  PMIItem,
+  CompoundGeom,
+  CADPart,
+  TreeItem,
+  StateChangedEvent,
+} from '@zeainc/zea-engine'
 
+import { SelectionManager } from '@zeainc/zea-ux'
+import { ZeaTreeView } from '@zeainc/zea-tree-view'
+//@ts-ignore - No Types for the GLTF loader yet.
+import { GLTFAsset } from '@zeainc/gltf-loader'
+import { DropZone } from './drop-zone'
+import { LoginDialog } from './login-dialog'
 
-/* eslint-disable require-jsdoc */
-export default function init() {
-  const {
-    Color,
-    Vec3,
-    Xfo,
-    Scene,
-    GLRenderer,
-    EnvMap,
-    resourceLoader,
-    AssetLoadContext,
-    GeomItem,
-    ObjAsset,
-    Lines,
-    LinesProxy,
-    Mesh,
-    MeshProxy,
-    InstanceItem,
-    CADAsset,
-    CADBody,
-    PMIItem,
-    CompoundGeom,
-    CADPart
-  } = zeaEngine
-  const { SelectionManager } = zeaUx
+interface AppData {
+  scene?: Scene
+  renderer?: GLRenderer
+  selectionManager?: SelectionManager
+}
 
+function init() {
   const urlParams = new URLSearchParams(window.location.search)
   const scene = new Scene()
   scene.setupGrid(10.0, 10)
 
-  const renderer = new GLRenderer(document.getElementById('canvas'), {
+  const renderer = new GLRenderer(<HTMLCanvasElement>document.getElementById('canvas'), {
     debugGeomIds: false,
     /* Enable frustum culling which speeds up rendering on large complex scenes */
     enableFrustumCulling: true,
@@ -41,10 +52,10 @@ export default function init() {
   renderer.getViewport().getCamera().setPositionAndTarget(new Vec3(2, 2, 2), new Vec3(0, 0, 0.5))
 
   const envMap = new EnvMap()
-  envMap.load('./data/StudioG.zenv')
+  envMap.load('/data/StudioG.zenv')
   scene.setEnvMap(envMap)
 
-  const appData = {
+  const appData: AppData = {
     scene,
     renderer,
   }
@@ -58,32 +69,50 @@ export default function init() {
   })
   appData.selectionManager = selectionManager
   // Setup Progress Bar
-  const progressElement = document.getElementById('progress')
-  progressElement.resourceLoader = resourceLoader
+  const progressElement = <HTMLProgressElement>document.getElementById('progress')
+  let hideId = 0
+  resourceLoader.on('progressIncremented', (event) => {
+    progressElement.value = event.percent
+    if (event.percent >= 100) {
+      // @ts-ignore
+      hideId = setTimeout(() => progressElement.classList.add('hidden'), 1000)
+    } else if (event.percent < 100) {
+      if (hideId) {
+        clearTimeout(hideId)
+        hideId = 0
+      }
+      progressElement.classList.remove('hidden')
+    }
+  })
 
   // Setup FPS Display
   const fpsElement = document.getElementById('fps')
-  fpsElement.renderer = renderer
+  if (fpsElement) {
+    let frameCounter = 0
+    renderer.on('redrawOccurred', () => {
+      frameCounter++
+    })
+    setInterval(() => {
+      fpsElement.textContent = `Fps: ${frameCounter * 2}`
+      frameCounter = 0
+    }, 500)
+  }
 
   // Setup TreeView Display
-  const $tree = document.querySelector('#tree')
+  const $tree = <ZeaTreeView>document.querySelector('#tree')
   $tree.setSelectionManager(selectionManager)
-  $tree.setTreeItem(scene.getRoot(), {
-    scene,
-    renderer,
-    selectionManager,
-    displayTreeComplexity: false,
-  })
+  $tree.setTreeItem(scene.getRoot())
 
   // let highlightedItem
   const highlightColor = new Color('#F9CE03')
   highlightColor.a = 0.1
-  const filterItem = (item) => {
+  const filterItem = (srcItem: TreeItem) => {
+    let item: TreeItem = srcItem
     while (item && !(item instanceof CADBody) && !(item instanceof PMIItem)) {
-      item = item.getOwner()
+      item = <TreeItem>item.getOwner()
     }
     if (item.getOwner() instanceof InstanceItem) {
-      item = item.getOwner()
+      item = <TreeItem>item.getOwner()
     }
     return item
   }
@@ -111,7 +140,7 @@ export default function init() {
         if (!event.shiftKey) {
           selectionManager.toggleItemSelection(item, !event.ctrlKey)
         } else {
-          const items = new Set()
+          const items = new Set<TreeItem>()
           items.add(item)
           selectionManager.deselectItems(items)
         }
@@ -127,24 +156,26 @@ export default function init() {
   })
 
   renderer.getXRViewport().then((xrvp) => {
-    fpsElement.style.bottom = '70px'
+    if (fpsElement) fpsElement.style.bottom = '70px'
 
     const xrButton = document.getElementById('xr-button')
-    xrButton.textContent = 'Launch VR'
-    xrButton.classList.remove('hidden')
+    if (xrButton) {
+      xrButton.textContent = 'Launch VR'
+      xrButton.classList.remove('hidden')
 
-    xrvp.on('presentingChanged', (event) => {
-      const { state } = event
-      if (state) {
-        xrButton.textContent = 'Exit VR'
-      } else {
-        xrButton.textContent = 'Launch VR'
-      }
-    })
+      xrvp.on('presentingChanged', (event: StateChangedEvent) => {
+        const { state } = event
+        if (state) {
+          xrButton.textContent = 'Exit VR'
+        } else {
+          xrButton.textContent = 'Launch VR'
+        }
+      })
 
-    xrButton.addEventListener('click', function (event) {
-      xrvp.togglePresenting()
-    })
+      xrButton.addEventListener('click', () => {
+        xrvp.togglePresenting()
+      })
+    }
 
     document.addEventListener('keydown', (event) => {
       if (event.key == ' ') {
@@ -156,7 +187,6 @@ export default function init() {
   if (urlParams.has('profile')) {
     renderer.startContinuousDrawing()
   }
-
 
   // ////////////////////////////////////////////
   // Load the asset
@@ -185,9 +215,9 @@ export default function init() {
         }
       }
     })
-    console.log(`parts:${geomItems} geomItems:${geomItems} lines:${lines} triangles:${triangles}`)
+    console.log(`parts:${parts} geomItems:${geomItems} lines:${lines} triangles:${triangles}`)
   }
-  const loadCADAsset = (zcad, filename) => {
+  const loadCADAsset = (zcad: string) => {
     // Note: leave the asset name empty so that the asset
     // gets the name of the product in the file.
     const asset = new CADAsset()
@@ -197,30 +227,6 @@ export default function init() {
     // PMI classes can bind to it.
     context.camera = renderer.getViewport().getCamera()
     asset.load(zcad, context).then(() => {
-      asset.materialLibrary.getMaterials().forEach(material => {
-        const edgeColorParam = material.getParameter('EdgeColor')
-        if (edgeColorParam) {
-          edgeColorParam.value = new Color(0, 0, 0, 0.2)
-        }
-      })
-      renderer.frameAll()
-      // The following is a quick hack to remove the black outlines around PMI text.
-      // We do not crete ourlines around transparent geometries, so by forcing
-      // the PMI items sub-trees to be considered transparent, it moves them into
-      // the GLTransparentPass, which does not draw outlines. this cleans up
-      // the rendering considerably.
-      asset.traverse((item) => {
-        if (item instanceof PMIItem) {
-          item.traverse((item) => {
-            if (item instanceof GeomItem) {
-              item.materialParam.value.__isTransparent = true
-            }
-          })
-          return false
-        }
-        return true
-      })
-
       renderer.frameAll()
     })
     asset.getGeometryLibrary().on('loaded', () => {
@@ -234,8 +240,7 @@ export default function init() {
     scene.getRoot().addChild(asset)
   }
 
-  const loadGLTFAsset = (url, filename) => {
-    const { GLTFAsset } = gltfLoader
+  const loadGLTFAsset = (url: string, filename: string = '') => {
     const asset = new GLTFAsset(filename)
     asset.load(url, filename).then(() => {
       calcSceneComplexity()
@@ -245,7 +250,7 @@ export default function init() {
     return asset
   }
 
-  const loadOBJAsset = (url, filename) => {
+  const loadOBJAsset = (url: string, filename: string = '') => {
     const asset = new ObjAsset(filename)
     asset.load(url).then(() => {
       calcSceneComplexity()
@@ -255,9 +260,9 @@ export default function init() {
     return asset
   }
 
-  const loadAsset = (url, filename) => {
+  const loadAsset = (url: string, filename: string = '') => {
     if (filename.endsWith('zcad')) {
-      return loadCADAsset(url, filename)
+      return loadCADAsset(url)
     } else if (filename.endsWith('gltf') || filename.endsWith('glb')) {
       return loadGLTFAsset(url, filename)
     } else if (filename.endsWith('obj')) {
@@ -268,13 +273,13 @@ export default function init() {
   }
 
   if (urlParams.has('zcad')) {
-    loadCADAsset(urlParams.get('zcad'))
+    loadCADAsset(urlParams.get('zcad')!)
   } else if (urlParams.has('gltf')) {
-    loadGLTFAsset(urlParams.get('gltf'))
+    loadGLTFAsset(urlParams.get('gltf')!)
   } else if (urlParams.has('obj')) {
-    loadOBJAsset(urlParams.get('obj'))
+    loadOBJAsset(urlParams.get('obj')!)
   } else {
-    const dropZone = document.getElementById('dropZone')
+    const dropZone = <DropZone>document.getElementById('dropZone')
     dropZone.display((url, filename) => {
       loadAsset(url, filename)
     })
@@ -283,4 +288,16 @@ export default function init() {
   // const xfo = new Xfo();
   // xfo.ori.setFromEulerAngles(new EulerAngles(90 * (Math.PI / 180), 0, 0));
   // asset.getParameter("GlobalXfo").setValue(xfo);
+}
+// To enable simple authentication in this app
+// change this value to true.
+if (false) {
+  // Show the login page.
+  const login = <LoginDialog>document.getElementById('login')
+  login.show(() => {
+    // When it is closed, init the scene.
+    init()
+  })
+} else {
+  init()
 }

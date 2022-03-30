@@ -1,10 +1,10 @@
 // A function is used for dragging and moving
-function dragElement(element, leftPanel, mainPanel, direction) {
-  var md // remember mouse down info
+function dragElement(element: HTMLElement, leftPanel: HTMLElement, mainPanel: HTMLElement, direction: string) {
+  var md: Record<any, any> // remember mouse down info
 
   element.onmousedown = onMouseDown
 
-  function onMouseDown(e) {
+  function onMouseDown(e: MouseEvent) {
     //console.log("mouse down: " + e.clientX);
     md = {
       e,
@@ -23,7 +23,7 @@ function dragElement(element, leftPanel, mainPanel, direction) {
     }
   }
 
-  function onMouseMove(e) {
+  function onMouseMove(e: MouseEvent) {
     // console.log("mouse move: " + e.clientX);
     var delta = {
       x: e.clientX - md.e.clientX,

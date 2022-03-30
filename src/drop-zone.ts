@@ -1,6 +1,9 @@
 let fileLoaded = false
 
 class DropZone extends HTMLElement {
+  modal: HTMLDivElement
+  content: HTMLDivElement
+  loadFileCallback?: (url: string, filename: string) => void
   constructor() {
     super()
     const shadowRoot = this.attachShadow({ mode: 'open' })
@@ -35,42 +38,46 @@ class DropZone extends HTMLElement {
     // const fileDropZone = this.shadowRoot.getElementById("fileDropZone");
 
     // Based on this answer: https://stackoverflow.com/a/61417954
-    const dragEnter = (ev) => {
+    const dragEnter = (ev: Event) => {
       // To enable the drop zone to
       if (fileLoaded) {
-        const fileDropZone = this.shadowRoot.getElementById('fileDropZone')
-        fileDropZone.classList.remove('pointer-events-none')
+        const fileDropZone = this.shadowRoot!.getElementById('fileDropZone')
+        fileDropZone!.classList.remove('pointer-events-none')
       }
       ev.preventDefault()
     }
-    const dragOver = (ev) => {
+    const dragOver = (ev: Event) => {
       ev.preventDefault()
     }
 
-    const handleDrop = (ev) => {
-      for (var i = 0; i < ev.dataTransfer.items.length; i++) {
-        // If dropped items aren't files, reject them
-        if (ev.dataTransfer.items[i].kind === 'file') {
-          const file = ev.dataTransfer.items[i].getAsFile()
-          handlefile(file)
+    const handleDrop = (ev: DragEvent) => {
+      if (ev.dataTransfer) {
+        for (var i = 0; i < ev.dataTransfer.items.length; i++) {
+          // If dropped items aren't files, reject them
+          if (ev.dataTransfer.items[i].kind === 'file') {
+            const file = ev.dataTransfer.items[i].getAsFile()
+            if (file) handlefile(file)
+          }
         }
       }
       ev.preventDefault()
     }
-    const handleSelect = (ev) => {
+    const handleSelect = (ev: Event) => {
+      // @ts-ignore
       for (var i = 0; i < ev.target.files.length; i++) {
-        let file = ev.target.files[i]
+        // @ts-ignore
+        let file = <File>ev.target.files[i]
         handlefile(file)
       }
       ev.preventDefault()
     }
-    const handlefile = (file) => {
+    const handlefile = (file: File) => {
       const reader = new FileReader()
 
       reader.addEventListener(
         'load',
         () => {
-          const url = reader.result
+          const url = <string>reader.result
           const filename = file.name
           this.loadFile(url, filename)
         },
@@ -79,7 +86,7 @@ class DropZone extends HTMLElement {
 
       reader.readAsDataURL(file)
     }
-    const select = this.shadowRoot.getElementById('dropHotSpot')
+    const select = <HTMLInputElement>this.shadowRoot!.getElementById('dropHotSpot')!
     select.addEventListener('change', handleSelect)
     select.addEventListener('drop', handleDrop)
     document.body.addEventListener('dragover', dragOver)
@@ -120,19 +127,18 @@ class DropZone extends HTMLElement {
     this.hide()
   }
 
-  display(loadFileCallback) {
+  display(loadFileCallback: (url: string, filename: string) => void) {
     this.loadFileCallback = loadFileCallback
-    this.modal.style['pointer-events'] = 'auto'
-    this.modal.style['display'] = 'block'
+    this.modal.style.setProperty('pointer-events', 'auto')
+    this.modal.style.setProperty('display', 'block')
   }
 
   hide() {
-    // const fileDropZone = this.shadowRoot.getElementById("fileDropZone");
-    this.modal.style['pointer-events'] = 'none'
-    this.modal.style['display'] = 'none'
+    this.modal.style.setProperty('pointer-events', 'none')
+    this.modal.style.setProperty('display', 'none')
   }
 
-  loadFile(url, filename) {
+  private loadFile(url: string, filename: string) {
     this.hide()
     fileLoaded = true
     if (this.loadFileCallback) this.loadFileCallback(url, filename)
@@ -140,3 +146,5 @@ class DropZone extends HTMLElement {
 }
 
 customElements.define('drop-zone', DropZone)
+
+export { DropZone }

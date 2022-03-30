@@ -78,17 +78,6 @@ main {
   display: flex;
 }
 
-#progress {
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
-  width: 100%;
-  height: 10px;
-}
-#progress::-webkit-progress-value {
-  background: #f9ce03;
-}
-
 .fps-display {
   position: absolute;
   bottom: 15px;
@@ -119,4 +108,21 @@ main {
 }
 .button:focus {
   background-color: #78b87a;
+}
+.fps-display {
+  color: black;
+}
+
+#progress {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  width: 100%;
+  height: 5px;
+}
+progress::-webkit-progress-value {
+  background: #f9ce03;
+}
+progress {
+  color: #f9ce03;
 }

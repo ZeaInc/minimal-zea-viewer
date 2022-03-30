@@ -5,7 +5,7 @@
     <link rel="shortcut icon" type="image/png" href="./data/favicon-32x32.png" />
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
-    <link rel="stylesheet" href="./src/styles.css" />
+    
 
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@4.3.0-99455a1/dist/index.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-ux@4.0.5/dist/index.umd.js"></script>
@@ -16,8 +16,10 @@
     <!-- 
     <script src="/src/zea-progress-bar.js" type="module"></script>
     <script src="/src/zea-fps-display.js" type="module"></script> -->
-    <script src="/src/drop-zone.ts" type="module"></script>
-    <script src="/src/login-dialog.ts" type="module"></script>
+    
+    
+    <script type="module" crossorigin src="/assets/index.d9d44455.js"></script>
+    <link rel="stylesheet" href="/assets/index.77904d89.css">
   </head>
 
   <body class="overflow-hidden h-full">
@@ -50,21 +52,8 @@
       <drop-zone id="dropZone" class="select-none"></drop-zone>
       <login-dialog id="login" class="select-none"></login-dialog>
     </div>
-    <script type="module">
-      import dragElement from './src/panels.ts'
-      const separatorV = document.getElementById('separatorV')
-      const leftPanel = document.getElementById('leftPanel')
-      const mainPanel = document.getElementById('mainPanel')
-      dragElement(separatorV, leftPanel, mainPanel, 'H')
+    
 
-      const separatorH = document.getElementById('separatorH')
-      const topPanel = document.getElementById('topPanel')
-      const bottomPanel = document.getElementById('bottomPanel')
-      if (separatorH && topPanel && bottomPanel) {
-        dragElement(separatorH, topPanel, bottomPanel, 'V')
-      }
-    </script>
-
-    <script type="module" src="./src/main.ts"></script>
+    
   </body>
 </html>
