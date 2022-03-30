@@ -1,3 +1,5 @@
+
+
 /* eslint-disable require-jsdoc */
 export default function init() {
   const {
@@ -19,7 +21,8 @@ export default function init() {
     CADAsset,
     CADBody,
     PMIItem,
-    CompoundGeom
+    CompoundGeom,
+    CADPart
   } = zeaEngine
   const { SelectionManager } = zeaUx
 
@@ -89,15 +92,6 @@ export default function init() {
       const geomItem = filterItem(event.intersectionData.geomItem)
       if (geomItem) {
         console.log(geomItem.getPath())
-
-        const geom = event.intersectionData.geomItem.geomParam.value
-        console.log(geom.getNumVertices(), event.intersectionData.geomItem.geomIndex)
-        let item = event.intersectionData.geomItem
-        while (item) {
-          const globalXfo = item.localXfoParam.value
-          console.log(item.getName(), globalXfo.sc.toString())
-          item = item.getOwner()
-        }
       }
     }
   })
@@ -163,15 +157,19 @@ export default function init() {
     renderer.startContinuousDrawing()
   }
 
+
   // ////////////////////////////////////////////
   // Load the asset
   const calcSceneComplexity = () => {
+    let parts = 0
     let geomItems = 0
     let triangles = 0
     let lines = 0
     scene.getRoot().traverse((item) => {
-      geomItems++
-      if (item instanceof GeomItem) {
+      if (item instanceof CADPart) {
+        parts++
+      } else if (item instanceof GeomItem) {
+        geomItems++
         const geom = item.geomParam.value
         if (geom instanceof Lines) {
           lines += geom.getNumSegments()
@@ -180,14 +178,14 @@ export default function init() {
         } else if (geom instanceof Mesh) {
           triangles += geom.computeNumTriangles()
         } else if (geom instanceof MeshProxy) {
-          triangles += geom.__buffers.indices ? geom.getNumTriangles() : geom.__buffers.numVertices / 3
+          triangles += geom.getNumTriangles()
         } else if (geom instanceof CompoundGeom) {
           lines += geom.getNumLineSegments()
           triangles += geom.getNumTriangles()
         }
       }
     })
-    console.log('geomItems:' + geomItems + ' lines: ' + lines + ' triangles:', triangles)
+    console.log(`parts:${geomItems} geomItems:${geomItems} lines:${lines} triangles:${triangles}`)
   }
   const loadCADAsset = (zcad, filename) => {
     // Note: leave the asset name empty so that the asset
@@ -199,6 +197,12 @@ export default function init() {
     // PMI classes can bind to it.
     context.camera = renderer.getViewport().getCamera()
     asset.load(zcad, context).then(() => {
+      asset.materialLibrary.getMaterials().forEach(material => {
+        const edgeColorParam = material.getParameter('EdgeColor')
+        if (edgeColorParam) {
+          edgeColorParam.value = new Color(0, 0, 0, 0.2)
+        }
+      })
       renderer.frameAll()
       // The following is a quick hack to remove the black outlines around PMI text.
       // We do not crete ourlines around transparent geometries, so by forcing
