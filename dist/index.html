@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html class="h-full">
+  <head>
+    <title>Zea CAD Viewer</title>
+    <link rel="shortcut icon" type="image/png" href="./data/favicon-32x32.png" />
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@4.3.0-99455a1/dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-ux@4.0.5/dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-tree-view@0.1.2/dist/index.umd.development.js"></script>
+
+    <script src="https://www.gstatic.com/draco/v1/decoders/draco_decoder_gltf.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/gltf-loader@4.0.5/dist/index.umd.js"></script>
+    <!-- 
+    <script src="/src/zea-progress-bar.js" type="module"></script>
+    <script src="/src/zea-fps-display.js" type="module"></script> -->
+    
+    
+    <script type="module" crossorigin src="/assets/index.d9d44455.js"></script>
+    <link rel="stylesheet" href="/assets/index.77904d89.css">
+  </head>
+
+  <body class="overflow-hidden h-full">
+    <div class="h-full flex flex-col">
+      <header class="p-2">
+        <img src="/data/logo-zea.svg" id="logo" />
+      </header>
+      <main class="flex flex-col flex-1">
+        <div class="flex-1" id="topPanel">
+          <div class="splitter">
+            <div id="leftPanel">
+              <zea-tree-view id="tree" class="select-none"></zea-tree-view>
+            </div>
+            <div class="separator" id="separatorV"></div>
+            <div id="mainPanel" class="flex-1">
+              <div id="canvas-holder">
+                <canvas id="canvas"></canvas>
+              </div>
+              <div class="xr-button hidden" id="xr-button"></div>
+              <div class="fps-display" id="fps"></div>
+              <progress id="progress" max="100" value="100"></progress>
+            </div>
+          </div>
+        </div>
+        <!-- Uncomment these lines to provide a resizable bottom panel
+        <div class="separator" id="separatorH"></div>
+        <div id="bottomPanel">
+        </div> -->
+      </main>
+      <drop-zone id="dropZone" class="select-none"></drop-zone>
+      <login-dialog id="login" class="select-none"></login-dialog>
+    </div>
+    
+
+    
+  </body>
+</html>
