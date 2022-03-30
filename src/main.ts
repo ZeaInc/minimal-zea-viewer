@@ -54,7 +54,7 @@ function init() {
   renderer.getViewport().getCamera().setPositionAndTarget(new Vec3(2, 2, 2), new Vec3(0, 0, 0.5))
 
   const envMap = new EnvMap()
-  envMap.load('/data/StudioG.zenv')
+  envMap.load('./data/StudioG.zenv')
   scene.setEnvMap(envMap)
 
   const appData: AppData = {
