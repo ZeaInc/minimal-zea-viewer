@@ -1,7 +1,7 @@
 # minimal-zea-viewer
 
-This is a minimal sample application built using vanilla JavaScript, HTML, and
-WebComponents. It is a simple, framework agnostic sample that shows how to load
+This is a minimal sample application built using Vite, TypeScript, HTML, and
+WebComponents. It is a simple sample that shows how to load
 and render various file formats, while providing a simple tree view to explore
 the model structure.
 
@@ -10,18 +10,18 @@ the model structure.
 1. Install dependencies:
 
 ```bash
-npm install
+yarn install
 ```
 
-2. Run `start` script:
+2. Run `dev` script:
 
 ```bash
-npm run start
+yarn run dev
 ```
 
 3. Go to:
 
-[http://localhost:8080/?zcad=data%2FHC_SRO4.zcad](http://localhost:8080/?zcad=data%2FHC_SRO4.zcad)
+[http://localhost:3000](http://localhost:3000)
 
 (Your port might be different.
 Check the actual port in the output of the previous command.)
