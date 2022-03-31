@@ -24,6 +24,7 @@ import {
 } from '@zeainc/zea-engine'
 
 import { SelectionManager } from '@zeainc/zea-ux'
+import '@zeainc/zea-tree-view'
 import { ZeaTreeView } from '@zeainc/zea-tree-view'
 //@ts-ignore - No Types for the GLTF loader yet.
 import { GLTFAsset } from '@zeainc/gltf-loader'
@@ -113,6 +114,7 @@ function init() {
     while (item && !(item instanceof CADBody) && !(item instanceof PMIItem)) {
       item = <TreeItem>item.getOwner()
     }
+    if (!item) return srcItem
     if (item.getOwner() instanceof InstanceItem) {
       item = <TreeItem>item.getOwner()
     }
