@@ -50,7 +50,12 @@ function init() {
     enableFrustumCulling: true,
   })
 
-  // renderer.solidAngleLimit = 0.0;
+  renderer.outlineThickness = 1.5
+  renderer.outlineSensitivity = 5
+  renderer.highlightOutlineThickness = 1.75
+  renderer.outlineColor = new Color(0, 0, 0, 0.6)
+  renderer.hiddenLineColor = new Color(0.2, 0.2, 0.2, 0.0)
+
   renderer.setScene(scene)
   renderer.getViewport().getCamera().setPositionAndTarget(new Vec3(2, 2, 2), new Vec3(0, 0, 0.5))
 

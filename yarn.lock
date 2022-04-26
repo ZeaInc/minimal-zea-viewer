@@ -15,10 +15,10 @@
     fast-png "^6.1.0"
     jpeg-js "^0.4.3"
 
-"@zeainc/zea-engine@4.3.0-88bedfc":
-  version "4.3.0-88bedfc"
-  resolved "https://registry.yarnpkg.com/@zeainc/zea-engine/-/zea-engine-4.3.0-88bedfc.tgz#9629c195b822b9be7c6f153f2461cc1add2fe750"
-  integrity sha512-/KMkMecduxab67qWMkITnAGT8LQpDxJE/UJJ4tB1kvdcCy2Qvjw6sheFsREddBch750F/+AZEvDd4OTQXNua0w==
+"@zeainc/zea-engine@4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@zeainc/zea-engine/-/zea-engine-4.4.0.tgz#0fbe3913138c29094c4bd939274996021c60cf7a"
+  integrity sha512-wLvXmGKwN0TDwO4ej7SL5+suJhQUF5sDuXNwgbqkUjv7tTnxX1BAKOsdMaxi3NRifQ2NjFJvGoyiPCzMD6xTOA==
   dependencies:
     lodash-es "^4.17.21"
 
@@ -27,10 +27,10 @@
   resolved "https://registry.yarnpkg.com/@zeainc/zea-tree-view/-/zea-tree-view-0.1.3.tgz#af39604b536ab64ff6eba709ae4a605d12afe108"
   integrity sha512-Nq6RBsCfGVNe/UvIlR2CEKMhfqdbt5d9yF1qnrnLczjyarnUQATAE3u7VVKZhS6FQTQ2xoU6+9NMlyUYwYsVAA==
 
-"@zeainc/zea-ux@^4.0.5":
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/@zeainc/zea-ux/-/zea-ux-4.0.5.tgz#06da0e6ffec92dd7d9b01ef1451702f2163de257"
-  integrity sha512-Zo/6NV1mhoRhojIGlTExq5+sgYqSKJ8xTNiqILbmmcKzaffdyi8/dJO/gEj+AdBAQhJnORYOMovz1c6JZa6P+A==
+"@zeainc/zea-ux@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@zeainc/zea-ux/-/zea-ux-4.1.0.tgz#8d050eacfdebe9657f6557c290df4d1e0ae82225"
+  integrity sha512-giQbN2TwMW41ZKQhrohxfCixYIjKhjwKld7phBIOPYNusEZqBJDqfSGAU2GROrOMY0IwZquEyPmVvGx/bj3BIA==
   dependencies:
     dom-to-image "^2.6.0"
 
