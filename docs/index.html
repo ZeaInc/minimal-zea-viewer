@@ -7,28 +7,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
     
 
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@4.3.0-99455a1/dist/index.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-ux@4.0.5/dist/index.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-tree-view@0.1.2/dist/index.umd.development.js"></script>
-
     <script src="https://www.gstatic.com/draco/v1/decoders/draco_decoder_gltf.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/gltf-loader@4.0.5/dist/index.umd.js"></script>
-    <script type="module" crossorigin src="./assets/index.a3416372.js"></script>
+    <script type="module" crossorigin src="./assets/index.98fcdaaf.js"></script>
     <link rel="stylesheet" href="./assets/index.77904d89.css">
   </head>
 
   <body class="overflow-hidden h-full">
     <div class="h-full flex flex-col">
       <header class="p-2">
-        <img src="./data/logo-zea.svg" id="logo" />
+        <img src="./data/logo-zea.png" id="logo" />
       </header>
       <main class="flex flex-col flex-1">
         <div class="flex-1" id="topPanel">
           <div class="splitter">
-            <div id="leftPanel">
+            <div id="leftPanel" class="invisible" style="width: 0px; left: 0px">
               <zea-tree-view id="tree" class="select-none"></zea-tree-view>
             </div>
-            <div class="separator" id="separatorV"></div>
+            <div class="separator" id="separatorV" style="left: 0px"></div>
             <div id="mainPanel" class="flex-1">
               <div id="canvas-holder">
                 <canvas id="canvas"></canvas>
@@ -48,7 +43,6 @@
       <login-dialog id="login" class="select-none"></login-dialog>
     </div>
     
-
     
   </body>
 </html>
