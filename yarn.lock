@@ -15,10 +15,10 @@
     fast-png "^6.1.0"
     jpeg-js "^0.4.3"
 
-"@zeainc/zea-engine@4.4.0":
-  version "4.4.0"
-  resolved "https://registry.yarnpkg.com/@zeainc/zea-engine/-/zea-engine-4.4.0.tgz#0fbe3913138c29094c4bd939274996021c60cf7a"
-  integrity sha512-wLvXmGKwN0TDwO4ej7SL5+suJhQUF5sDuXNwgbqkUjv7tTnxX1BAKOsdMaxi3NRifQ2NjFJvGoyiPCzMD6xTOA==
+"@zeainc/zea-engine@4.4.0-bc7fc86":
+  version "4.4.0-bc7fc86"
+  resolved "https://registry.yarnpkg.com/@zeainc/zea-engine/-/zea-engine-4.4.0-bc7fc86.tgz#9bca82da849d526c8a133f5958f6e0f4e399bc95"
+  integrity sha512-Y40uHHJImvrXtMlc68b10F+rlAgCwEcB9F9D+gQZSD7k0sC3rjNLk89riAM7ys1irb1ink8mi7g+pSvrJ6HHEA==
   dependencies:
     lodash-es "^4.17.21"
 

@@ -21,6 +21,7 @@ import {
   CADPart,
   TreeItem,
   StateChangedEvent,
+  XRViewport,
 } from '@zeainc/zea-engine'
 
 import { SelectionManager } from '@zeainc/zea-ux'
@@ -44,10 +45,12 @@ function init() {
   const scene = new Scene()
   scene.setupGrid(10.0, 10)
 
+  const xrMode = urlParams.has('xrMode') ? urlParams.get('xrMode') : 'AR'
   const renderer = new GLRenderer(<HTMLCanvasElement>document.getElementById('canvas'), {
     debugGeomIds: false,
     /* Enable frustum culling which speeds up rendering on large complex scenes */
     enableFrustumCulling: true,
+    xrMode: xrMode == 'AR' ? 'AR' : 'VR',
   })
 
   renderer.outlineThickness = 1.5
@@ -168,20 +171,20 @@ function init() {
     }
   })
 
-  renderer.getXRViewport().then((xrvp) => {
+  renderer.getXRViewport().then((xrvp: XRViewport) => {
     if (fpsElement) fpsElement.style.bottom = '70px'
 
     const xrButton = document.getElementById('xr-button')
     if (xrButton) {
-      xrButton.textContent = 'Launch VR'
+      xrButton.textContent = 'Launch ' + xrMode
       xrButton.classList.remove('hidden')
 
       xrvp.on('presentingChanged', (event: StateChangedEvent) => {
         const { state } = event
         if (state) {
-          xrButton.textContent = 'Exit VR'
+          xrButton.textContent = 'Exit ' + xrMode
         } else {
-          xrButton.textContent = 'Launch VR'
+          xrButton.textContent = 'Launch ' + xrMode
         }
       })
 
