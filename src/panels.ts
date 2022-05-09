@@ -25,7 +25,7 @@ function dragElement(element: HTMLElement, leftPanel: HTMLElement, mainPanel: HT
 
   function onMouseMove(e: MouseEvent) {
     // console.log("mouse move: " + e.clientX);
-    var delta = {
+    const delta = {
       x: e.clientX - md.e.clientX,
       y: e.clientY - md.e.clientY,
     }

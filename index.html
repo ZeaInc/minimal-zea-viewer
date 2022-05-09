@@ -13,15 +13,15 @@
   <body class="overflow-hidden h-full">
     <div class="h-full flex flex-col">
       <header class="p-2">
-        <img src="./data/logo-zea.svg" id="logo" />
+        <img src="./data/logo-zea.png" id="logo" />
       </header>
       <main class="flex flex-col flex-1">
         <div class="flex-1" id="topPanel">
           <div class="splitter">
-            <div id="leftPanel">
+            <div id="leftPanel" class="invisible" style="width: 0px; left: 0px">
               <zea-tree-view id="tree" class="select-none"></zea-tree-view>
             </div>
-            <div class="separator" id="separatorV"></div>
+            <div class="separator" id="separatorV" style="left: 0px"></div>
             <div id="mainPanel" class="flex-1">
               <div id="canvas-holder">
                 <canvas id="canvas"></canvas>
@@ -53,8 +53,26 @@
       if (separatorH && topPanel && bottomPanel) {
         dragElement(separatorH, topPanel, bottomPanel, 'V')
       }
-    </script>
 
+      let leftPanelVisible = false
+      const toggleSidePanel = () => {
+        if (leftPanelVisible) {
+          leftPanel.classList.add('invisible')
+          leftPanel.style.width = '0px'
+          separatorV.style.left = '0px'
+          leftPanelVisible = false
+        } else {
+          leftPanel.classList.remove('invisible')
+          leftPanel.style.width = '300px'
+          separatorV.style.left = '300px'
+          leftPanelVisible = true
+        }
+      }
+
+      document.getElementById('logo').addEventListener('click', toggleSidePanel)
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      if (!isMobileDevice) toggleSidePanel()
+    </script>
     <script type="module" src="./src/main.ts"></script>
   </body>
 </html>
